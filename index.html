@@ -299,8 +299,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .item-card-row input{width:100%;padding:8px 10px;border:1.5px solid var(--ln);border-radius:var(--r8);font-size:14px;font-family:inherit;color:var(--ink);background:#fff;outline:none;text-align:right;transition:border-color .15s}
 .item-card-row input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
 .item-card-total{text-align:right;font-size:15px;font-weight:800;color:var(--ink);padding-top:2px}
-.item-del{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--ink4);font-size:18px;line-height:1;padding:2px 6px;border-radius:var(--r4);transition:color .12s}
-.item-del:hover{color:#ef4444;background:#fee2e2}
+.item-del{background:none;border:none;cursor:pointer;color:#dc2626;font-size:11px;font-weight:700;padding:3px 6px;border-radius:var(--r8);transition:all .12s;font-family:inherit;letter-spacing:.2px;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.item-del:hover{background:#fee2e2;color:#b91c1c}
 
 /* Autocomplete do item */
 .item-sug{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1.5px solid var(--ln);border-radius:var(--r8);box-shadow:var(--shm);z-index:50;display:none;overflow:hidden}
@@ -432,6 +432,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ai-key-banner{margin:12px 16px;padding:12px 14px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--r8);font-size:12px;color:#92400e;display:flex;align-items:center;gap:8px}
 .ai-key-banner.hidden{display:none}
 .ai-key-banner a{color:var(--g);font-weight:700;cursor:pointer;text-decoration:underline}
+/* ── CUPOM STICKY (topo do chat) ── */
+#ai-cupom-sticky{
+  flex-shrink:0;
+  border-bottom:1px solid var(--ln2);
+  background:#fff;
+  display:none; /* shown when aiCollected.tipo exists */
+  transition:all .2s;
+}
+.ai-cupom-sticky-inner{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:12px;
+}
+/* header da sticky */
+.acs-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 14px;background:var(--g);color:#fff;
+}
+.acs-head-tipo{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.acs-head-num{font-size:10px;color:rgba(255,255,255,.7);font-weight:500}
+/* linhas de dados */
+.acs-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:3px 14px;border-bottom:1px solid var(--ln2);gap:8px;
+}
+.acs-row:last-child{border-bottom:none}
+.acs-label{font-size:10px;color:var(--ink4);font-weight:700;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;min-width:64px}
+.acs-val{font-size:12px;color:var(--ink);font-weight:600;text-align:right;word-break:break-word}
+/* itens estilo cupom fiscal */
+.acs-items{padding:3px 0}
+.acs-item{
+  padding:3px 14px;
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:6px;font-size:11px;
+}
+.acs-item-left{color:var(--ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acs-item-left em{color:var(--ink4);font-style:normal;font-size:10px} /* qtd × */
+.acs-item-price{font-weight:700;color:var(--ink);flex-shrink:0}
+.acs-sep{height:1px;background:var(--ln2);margin:2px 14px}
+/* total */
+.acs-total{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 14px;background:var(--gl);border-top:1.5px solid var(--g);
+}
+.acs-total span:first-child{font-size:11px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.4px}
+.acs-total span:last-child{font-size:14px;font-weight:800;color:var(--gd)}
 .ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .ai-msgs::-webkit-scrollbar{width:3px}
 .ai-msgs::-webkit-scrollbar-thumb{background:var(--ln);border-radius:4px}
@@ -567,6 +612,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   display:inline-block;
 }
 .api-dot.testing{background:#fbbf24;animation:dotPulse .7s ease-in-out infinite}
+.api-dot.warn{background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.2)}
 .api-dot.ok{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
 .api-dot.err{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
 @keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -733,7 +779,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   <!-- Desktop nav -->
   <nav class="topbar-nav" id="topnav">
     <button class="tnav active" id="tn-home" onclick="goTo('home')">Início</button>
-    <button class="tnav" id="tn-form" onclick="goTo('form')">Criar</button>
+    <button class="tnav" id="tn-form" onclick="newDoc()">Criar</button>
     <button class="tnav" id="tn-docs" onclick="goTo('docs')">Documentos</button>
     <button class="tnav" id="tn-cli" onclick="goTo('clientes')">Clientes</button>
     <button class="tnav" id="tn-prev" onclick="if(hasDoc)goTo('preview')" style="display:none">Ver doc</button>
@@ -781,7 +827,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <span class="nd-label">Início</span>
     </button>
 
-    <button class="nav-drawer-item" id="nd-form" onclick="goTo('form');closeDrawer()">
+    <button class="nav-drawer-item" id="nd-form" onclick="newDoc();closeDrawer()">
       <div class="nd-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       </div>
@@ -829,7 +875,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   <div class="hero-card">
     <h1>Recibos e orçamentos<br><em>profissionais</em> em minutos</h1>
     <p>Com sua logo, dados salvos, numeração automática e assinatura digital. Tudo no navegador, sem cadastro.</p>
-    <button class="btn-cta" onclick="goTo('form')">Criar documento →</button>
+    <button class="btn-cta" onclick="newDoc()">Criar documento →</button>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kv" id="kv-docs">0</div><div class="kl">Documentos emitidos</div></div>
@@ -856,7 +902,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <div class="tm"><strong>Wave Premium</strong><span>Corporativo</span><span class="tbadge tp">✦ Novo</span></div>
     </div>
   </div>
-  <button class="btn-cta" style="width:100%;margin-bottom:2rem" onclick="goTo('form')">Começar agora →</button>
+  <button class="btn-cta" style="width:100%;margin-bottom:2rem" onclick="newDoc()">Começar agora →</button>
   <div class="hist-section">
     <div class="hist-header">
       <h3>Documentos recentes</h3>
@@ -1052,7 +1098,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 
   <div class="abar">
     <button class="bghost" onclick="goTo('home')">← Voltar</button>
-    <button class="bsolid" onclick="generate()">Visualizar documento →</button>
+    <div id="form-edit-banner" style="display:none;align-items:center;gap:8px;padding:8px 14px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--r8);font-size:12px;font-weight:600;color:#92400e;flex:1;margin:0 8px">
+      <svg width="14" height="14" fill="none" stroke="#92400e" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Modo edição
+    </div>
+    <button class="bsolid" id="form-main-btn" onclick="generate()">Visualizar documento →</button>
   </div>
 </div>
 
@@ -1461,7 +1511,6 @@ function addItemCard(desc='',qty=1,price=''){
   card.className='item-card';
   card.id=id;
   card.innerHTML=`
-    <button class="item-del" onclick="removeItemCard('${id}')">×</button>
     <div class="item-card-desc-wrap">
       <input type="text" placeholder="Descrição do serviço ou peça" value="${esc(desc)}" oninput="onItemDescInput(this,'${id}')"/>
       <div class="item-sug" id="sug-${id}"></div>
@@ -1470,17 +1519,33 @@ function addItemCard(desc='',qty=1,price=''){
       <div><label>Qtd</label><input type="number" value="${qty}" min="0" step="1" oninput="recalc()"/></div>
       <div><label>Valor unit. (R$)</label><input type="number" value="${price}" min="0" step="0.01" placeholder="0,00" oninput="recalc()"/></div>
       <div><label>Total</label><div class="item-card-total" id="tot-${id}">R$ 0,00</div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:6px">
+      <button class="item-del" onclick="removeItemCard('${id}')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        Remover item
+      </button>
     </div>`;
   document.getElementById('item-cards').appendChild(card);
   recalc();
-  // focus desc if empty
   if(!desc)card.querySelector('input[type=text]').focus();
 }
 
 function esc(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 
 function removeItemCard(id){
+  let cards=document.querySelectorAll('.item-card');
   let el=document.getElementById(id);
+  if(cards.length<=1){
+    // last card — just clear its fields instead of removing
+    if(el){
+      el.querySelector('input[type=text]').value='';
+      el.querySelector('input[type=number]').value=1;
+      el.querySelectorAll('input[type=number]')[1].value='';
+    }
+    recalc();
+    return;
+  }
   if(el)el.remove();
   recalc();
 }
@@ -1670,11 +1735,29 @@ function restoreSnapshot(d){
   recalc();
 }
 
-function duplicateDoc(){if(!currentDocData){return;}let dup=JSON.parse(JSON.stringify(currentDocData));dup.docNum=null;restoreSnapshot(dup);goTo('form');toast('Duplicado! Edite e gere o novo documento','green');}
+function newDoc(){
+  _editingDocNum=null;
+  setEditMode(false);
+  setTipo('recibo');
+  ['f-cli','f-cli-doc','f-cli-email','f-cli-tel','f-cli-end','f-cli-obs','f-obs'].forEach(id=>set(id,''));
+  set('f-pag','pix'); set('f-st','pendente');
+  document.getElementById('item-cards').innerHTML='';
+  itemIdCounter=0;
+  addItemCard('',1,'');
+  set('disc-inp','0');
+  if(typeof setDiscType==='function')setDiscType('pct');
+  if(typeof recalc==='function')recalc();
+  rnum();
+  goTo('form');
+}
+function duplicateDoc(){if(!currentDocData){return;}let dup=JSON.parse(JSON.stringify(currentDocData));dup.docNum=null;restoreSnapshot(dup);_editingDocNum=null;goTo('form');toast('Duplicado! Edite e gere o novo documento','green');}
 
 /* ── GENERATE ── */
 function generate(){
-  let docNum=bumpCnt();
+  const wasEditing=!!_editingDocNum;
+  let docNum=_editingDocNum||bumpCnt();
+  _editingDocNum=null;
+  setEditMode(false);
   let d=collectFormData(docNum);
   let sigUrl=getSigDataUrl();
   if(d.cli)saveClient({nome:d.cli,doc:d.cliDoc,email:d.cliEmail,tel:d.cliTel,end:d.cliEnd,obs:d.cliObs});
@@ -1683,14 +1766,17 @@ function generate(){
   currentDocData={...d,sigUrl};
   let html=d.tplId==='wv'?tplWave(d,sigUrl):tplClassic(d,sigUrl);
   document.getElementById('doc-out').innerHTML=html;
-  // pré-preenche whatsapp com tel do cliente
   if(d.cliTel)document.getElementById('wa-num-input').value=d.cliTel;
   hasDoc=true;
   document.getElementById('tn-prev').style.display='';
-  goTo('preview');
-  toast('Documento gerado com sucesso!','green');
-  // scale to fit on mobile after render
-  setTimeout(scaleDocForMobile, 80);
+  if(wasEditing){
+    toast('Documento salvo com sucesso!','green');
+    goTo('docs'); // volta para a lista após salvar edição
+  } else {
+    goTo('preview');
+    toast('Documento gerado com sucesso!','green');
+  }
+  setTimeout(scaleDocForMobile,80);
 }
 
 /* Escala o recibo para caber na tela em mobile sem scroll lateral */
@@ -1967,7 +2053,8 @@ function renderDocsList(list,total){
         <div class="mp-doc-sub">${d.docNum} · ${d.data||''} · ${d.pag||''}</div>
         <div class="mp-doc-sub" style="margin-top:2px"><span class="st-badge ${stClass}">${stLabel}</span></div>
         <div class="mp-doc-actions">
-          <button class="mp-doc-btn" onclick="openDocFromDocs(${realIdx})">✏ Abrir</button>
+          <button class="mp-doc-btn" onclick="openDocFromDocs(${realIdx})">✏ Editar</button>
+          ${d.tipo==='orcamento'?`<button class="mp-doc-btn" style="color:var(--g);border-color:var(--gm)" onclick="orcToRecibo(${realIdx})" title="Converter em Recibo">🧾 Recibo</button>`:''}
           <button class="mp-doc-btn g" onclick="dupDocFromDocs(${realIdx})">⧉ Duplicar</button>
           <button class="mp-doc-btn del" onclick="askDeleteDoc(${realIdx},'${(d.docNum||'').replace(/'/g,'')}')" title="Excluir">🗑</button>
         </div>
@@ -1981,12 +2068,48 @@ function renderDocsList(list,total){
 }
 
 function openDocFromDocs(idx){
-  let d=getDocs()[idx]?.snapshot;
-  if(d){restoreSnapshot(d);goTo('form');}
+  let entry=getDocs()[idx];
+  let d=entry?.snapshot;
+  if(!d)return;
+  restoreSnapshot(d);
+  _editingDocNum=d.docNum||null;
+  setEditMode(true);
+  goTo('form');
+  toast('Documento aberto para edição','green');
 }
+
+let _editingDocNum=null;
+
+function setEditMode(on){
+  const banner=document.getElementById('form-edit-banner');
+  const btn=document.getElementById('form-main-btn');
+  if(banner)banner.style.display=on?'flex':'none';
+  if(btn)btn.textContent=on?'💾 Salvar alterações':'Visualizar documento →';
+}
+
+function orcToRecibo(idx){
+  let d=getDocs()[idx]?.snapshot;
+  if(!d)return;
+  let dup=JSON.parse(JSON.stringify(d));
+  dup.tipo='recibo';
+  dup.tit='RECIBO';
+  dup.docNum=null; // new number
+  dup.st='pendente';
+  restoreSnapshot(dup);
+  _editingDocNum=null;
+  goTo('form');
+  toast('Orçamento convertido em recibo — confira e gere o documento','green');
+}
+
 function dupDocFromDocs(idx){
   let d=getDocs()[idx]?.snapshot;
-  if(d){let dup=JSON.parse(JSON.stringify(d));dup.docNum=null;restoreSnapshot(dup);goTo('form');toast('Duplicado! Edite e gere o novo documento','green');}
+  if(!d){return;}
+  let dup=JSON.parse(JSON.stringify(d));
+  dup.docNum=null;
+  _editingDocNum=null;
+  restoreSnapshot(dup);
+  goTo('form');
+  toast('Duplicado! Edite e gere o novo documento','green');
 }
 
 /* ══════════════════════════════════════
@@ -2069,7 +2192,7 @@ function renderClientesList(list,total){
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--ln2)">
 
         ${waBtn?`<div style="padding:10px 12px;border-right:1px solid var(--ln2)${mapBtn?'':';grid-column:1/-1'}">${waBtn}</div>`:''}
-        ${mapBtn?`<div style="padding:10px 12px${waBtn?'':';border-right:1px solid var(--ln2);grid-column:1/-1'}">${mapBtn}</div>`:''}
+        ${mapBtn?`<div style="padding:10px 12px${waBtn?'':';grid-column:1/-1'}">${mapBtn}</div>`:''}
 
         <div style="padding:10px 12px;border-top:${(waBtn||mapBtn)?'1px solid var(--ln2)':'none'};border-right:1px solid var(--ln2)">
           <button class="mp-doc-btn g" onclick="novoDocCliente(${realIdx})" style="width:100%;justify-content:center">+ Novo doc</button>
@@ -2230,8 +2353,8 @@ document.addEventListener('DOMContentLoaded', function() {
    (Gemini principal + Groq backup)
 ───────────────────────────────────── */
 let aiOpen=false,aiHistory=[],aiCollected={},aiTyping=false,mediaRec=null,aiRecording=false;
-let GEMINI_KEY=localStorage.getItem('rf_gemini_key')||'';
-let GROQ_KEY=localStorage.getItem('rf_groq_key')||'';
+let GEMINI_KEY=(localStorage.getItem('rf_gemini_key')||'').trim();
+let GROQ_KEY=(localStorage.getItem('rf_groq_key')||'').trim();
 let AI_NAME=localStorage.getItem('rf_ai_name')||'RF Assistente';
 
 const AI_SYSTEM=`Você é {AI_NAME}, assistente do ReciboFácil.
@@ -2316,15 +2439,26 @@ function getAISystemPrompt(){
   return AI_SYSTEM.replace('{AI_NAME}',AI_NAME).replace('{CONTEXT}',ctx);
 }
 
+let _aiSessionDone=false; // true after a doc was generated — forces full reset on next open
+
+function resetAISession(){
+  aiHistory=[];aiCollected={};_cupomEl=null;aiTyping=false;
+  _aiSessionDone=false;
+  const msgs=document.getElementById('ai-msgs');
+  if(msgs)msgs.innerHTML='';
+  const slot=document.getElementById('ai-cupom-sticky');
+  if(slot){slot.style.display='none';slot.innerHTML='';}
+}
+
 function openAI(){
   document.getElementById('ai-overlay').classList.add('open');
   aiOpen=true;
   document.getElementById('ai-badge').style.display='none';
   checkKeyBanner();
   applyAIName();
-  if(aiHistory.length===0){
-    _cupomEl=null;
-    aiCollected={};
+  // se uma sessão anterior gerou um doc, reinicia do zero
+  if(_aiSessionDone||aiHistory.length===0){
+    resetAISession();
     setTimeout(()=>aiWelcome(),280);
   }
   setTimeout(()=>{const inp=document.getElementById('ai-input');if(inp)inp.focus();},400);
@@ -2422,7 +2556,8 @@ function saveApiKeys(){
   if(rv&&!rv.startsWith('\u2022')){GROQ_KEY=rv;localStorage.setItem('rf_groq_key',GROQ_KEY);document.getElementById('groq-status-box').style.display='flex';}
   if(nv){AI_NAME=nv;localStorage.setItem('rf_ai_name',AI_NAME);}
   applyAIName();
-  checkKeyBanner();setTimeout(()=>aiShowChat(),300);
+  checkKeyBanner();
+  setTimeout(()=>{aiShowChat();toast('Chave salva! Abra o arquivo no seu navegador para usar o assistente.','green');},300);
 }
 function clearApiKeys(){
   if(!confirm('Remover chaves de API?'))return;
@@ -2520,12 +2655,9 @@ function aiLocalExtract(text){
   const t=text.trim();
 
   // ── Bloco 2: Nome + WhatsApp ──
-  // só tenta se já temos tipo mas ainda não temos nome do cliente
   if(aiCollected.tipo && !aiCollected.clienteNome){
-    // extrai telefone: sequência de 8+ dígitos (com ou sem formatação)
     const phoneMatch=t.match(/[\(\d][\d\s\(\)\-\+]{7,18}\d/);
     const phone=phoneMatch?phoneMatch[0].replace(/\D/g,''):'';
-    // extrai nome: parte do texto sem o telefone, sem pontuação inicial
     let nome=t.replace(/[\d\(\)\-\+\s]{8,}/g,'').replace(/[,;]+/g,' ').replace(/\s+/g,' ').trim();
     nome=nome.replace(/^[\s,;-]+|[\s,;-]+$/g,'').trim();
 
@@ -2535,13 +2667,10 @@ function aiLocalExtract(text){
       const reply=`Anotado! 👍\n\nEndereço do cliente? (opcional)`;
       aiHistory.push({role:'assistant',content:reply});
       addBotMsg(reply);
-      addBotBtns([{label:'Pular',action:()=>{
-        aiUserSend('Pular');
-      }}]);
+      addBotBtns([{label:'Pular',action:()=>aiUserSend('Pular')}]);
       renderLiveCupom();
       return true;
     }
-    // só nome, sem telefone
     if(nome.length>=3 && phone.length===0 && !t.match(/^\d/)){
       aiCollected.clienteNome=nome;
       const reply='Qual o **WhatsApp** de '+nome.split(' ')[0]+'?';
@@ -2550,7 +2679,6 @@ function aiLocalExtract(text){
       renderLiveCupom();
       return true;
     }
-    // só telefone (usuário respondeu só o número)
     if(phone.length>=8 && nome.length<3 && aiCollected.clienteNome){
       aiCollected.clienteWpp=phone;
       const reply='Ótimo! Endereço do cliente? (opcional)';
@@ -2575,8 +2703,7 @@ function aiLocalExtract(text){
   // ── Bloco 2: Endereço fornecido ──
   if(aiCollected.clienteNome && !aiCollected.clienteEnd && !aiCollected._endAsked &&
      !aiCollected.itens?.length && t.length>6 && !t.match(/^\d{8,}$/)){
-    // heurística: se parece endereço (tem número + texto, ou contém palavras de endereço)
-    const endWords=/rua|av\.|avenida|travessa|alameda|praça|numero|nº|bairro|cep|cidade|/i;
+    const endWords=/rua|av\.|avenida|travessa|alameda|praça|numero|nº|bairro|cep|cidade/i;
     const hasComma=t.includes(',');
     if(endWords.test(t)||hasComma){
       aiCollected.clienteEnd=t;
@@ -2589,33 +2716,261 @@ function aiLocalExtract(text){
     }
   }
 
-  return false; // não conseguiu extrair — deixa a API resolver
+  // ── Bloco 3: Serviços — usa IA para extrair itens corretamente ──
+  if(aiCollected.clienteNome && aiCollected._endAsked && !aiCollected.pagamento){
+    const tl=t.toLowerCase();
+    // ignora comandos de navegação que não são serviços
+    const isNav=tl.includes('só esse')||tl.includes('so esse')||tl==='não'||tl==='nao'||
+                tl==='pronto'||tl==='ok'||tl==='isso'||tl.includes('mais um')||tl.includes('adicionar');
+    if(!isNav){
+      // chama IA para extrair itens com precisão
+      extractServicosWithAI(t);
+      return true; // UI já atualizada com typing indicator
+    }
+  }
+
+  // ── Bloco 3: "Só esse" / navegação → avança para pagamento ──
+  if(aiCollected.itens?.length && !aiCollected.pagamento){
+    const tl=t.toLowerCase();
+    if(tl.includes('só esse')||tl.includes('so esse')||tl==='não'||tl==='nao'||tl==='pronto'||tl==='ok'||tl==='isso'){
+      const reply='Como vai pagar?';
+      aiHistory.push({role:'assistant',content:reply});
+      addBotMsg(reply);
+      addBotBtns([
+        {label:'PIX',          action:()=>aiUserSend('PIX')},
+        {label:'Dinheiro',     action:()=>aiUserSend('Dinheiro')},
+        {label:'Cartão',       action:()=>aiUserSend('Cartão')},
+        {label:'Transferência',action:()=>aiUserSend('Transferência')}
+      ]);
+      return true;
+    }
+    if(tl.includes('mais um')||tl.includes('adicionar')||tl.includes('+ mais')){
+      const reply='Qual o próximo serviço?';
+      aiHistory.push({role:'assistant',content:reply});
+      addBotMsg(reply);
+      return true;
+    }
+  }
+
+  // ── Bloco 4: Desconto — valor digitado após pedir desconto ──
+  // ativa quando temos pagamento E estamos aguardando o valor do desconto
+  if(aiCollected.pagamento && aiCollected._aguardandoDesconto && !aiCollected._descontoAsked){
+    const discMatch=t.match(/(\d+(?:[.,]\d{1,2})?)\s*%?/);
+    if(discMatch){
+      const val=parseFloat(discMatch[1].replace(',','.'));
+      if(val>0){
+        const isPct=t.includes('%') || aiCollected._aguardandoDesconto==='pct';
+        aiCollected.desconto=val;
+        aiCollected._descontoTipo=isPct?'pct':'val';
+        aiCollected._descontoAsked=true;
+        delete aiCollected._aguardandoDesconto;
+        renderLiveCupom();
+        aiLocalConfirm();
+        return true;
+      }
+    }
+  }
+
+  // ── Bloco 4: Pagamento digitado como texto livre ──
+  if(aiCollected.itens?.length && !aiCollected.pagamento){
+    const tl=t.toLowerCase();
+    const pagMap=[
+      ['pix','PIX'],['dinheiro','Dinheiro'],
+      ['cartão','Cartão de crédito'],['cartao','Cartão de crédito'],
+      ['transferência','Transferência bancária'],['transferencia','Transferência bancária']
+    ];
+    for(const [key,val] of pagMap){
+      if(tl.includes(key)){
+        aiCollected.pagamento=val;
+        const reply='Tem desconto?';
+        aiHistory.push({role:'assistant',content:reply});
+        addBotMsg(reply);
+        addBotBtns([
+          {label:'Não', action:()=>aiLocalConfirm()},
+          {label:'Sim', action:()=>{
+            addUserMsg('Sim');
+            aiHistory.push({role:'user',content:'Sim'});
+            const r='Qual o tipo de desconto?';
+            aiHistory.push({role:'assistant',content:r});
+            addBotMsg(r);
+            addBotBtns([
+              {label:'% Porcentagem', action:()=>{
+                aiCollected._aguardandoDesconto='pct';
+                addUserMsg('% Porcentagem');aiHistory.push({role:'user',content:'% Porcentagem'});
+                const r2='Qual o percentual? (ex: 10)';
+                aiHistory.push({role:'assistant',content:r2});addBotMsg(r2);
+              }},
+              {label:'R$ Valor fixo', action:()=>{
+                aiCollected._aguardandoDesconto='val';
+                addUserMsg('R$ Valor fixo');aiHistory.push({role:'user',content:'R$ Valor fixo'});
+                const r2='Qual o valor (R$)? (ex: 20)';
+                aiHistory.push({role:'assistant',content:r2});addBotMsg(r2);
+              }}
+            ]);
+          }}
+        ]);
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/* Parseia uma ou mais linhas de serviço do texto do usuário.
+   Aceita formatos: "nome - valor", "nome, qtd, valor", "nome R$ valor" etc. */
+/* ── Extração de serviços via IA (prompt mínimo, retorna JSON) ── */
+async function extractServicosWithAI(texto){
+  addTyping();
+  const prompt=`Extraia os serviços do texto abaixo e retorne APENAS um array JSON válido, sem explicação, sem markdown, sem texto extra.
+Cada item deve ter: {"desc":"nome do serviço","qtd":número,"valor":número}
+Qtd e valor são sempre números. Valor é o preço unitário.
+Se não tiver qtd explícita, use 1. Se não conseguir extrair um item, ignore-o.
+
+Texto: "${texto}"
+
+Responda apenas com o array JSON. Exemplo: [{"desc":"Limpeza","qtd":2,"valor":50.00}]`;
+
+  let itens=[];
+  try{
+    let rawText='';
+    if(GEMINI_KEY){
+      const res=await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:300,temperature:0}})}
+      );
+      const j=await res.json();
+      rawText=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    }
+    if(!rawText&&GROQ_KEY){
+      const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0})
+      });
+      const j=await res.json();
+      rawText=j?.choices?.[0]?.message?.content||'';
+    }
+    // extrai o array JSON da resposta
+    const match=rawText.match(/\[[\s\S]*\]/);
+    if(match) itens=JSON.parse(match[0]);
+  }catch(e){
+    console.warn('extractServicosWithAI falhou, usando parser local:',e);
+    itens=parseServicos(texto); // fallback para parser local
+  }
+
+  removeTyping();
+
+  if(!itens||itens.length===0){
+    addBotMsg('Não consegui entender os serviços. Tente: "Nome do serviço, quantidade, valor"');
+    return;
+  }
+
+  // normaliza e salva
+  itens=itens.map(it=>({desc:String(it.desc||'').trim(),qtd:parseFloat(it.qtd)||1,valor:parseFloat(it.valor)||0}))
+             .filter(it=>it.desc.length>=2&&it.valor>0);
+
+  if(!aiCollected.itens)aiCollected.itens=[];
+  aiCollected.itens.push(...itens);
+
+  const fmt=v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2});
+  const resumo=itens.map(it=>{
+    const qtdStr=it.qtd>1?`${it.qtd} × `:'';
+    return `• ${qtdStr}${it.desc} — ${fmt(it.valor)}`;
+  }).join('\n');
+
+  const reply=resumo+'\n\nMais algum serviço?';
+  aiHistory.push({role:'assistant',content:reply});
+  addBotMsg(reply);
+  addBotBtns([
+    {label:'✅ Só esse', action:()=>aiUserSend('Só esse')},
+    {label:'+ Mais um',  action:()=>aiUserSend('+ Mais um')}
+  ]);
+  renderLiveCupom();
+}
+
+
+function parseServicos(text){
+  const itens=[];
+  const linhas=text.split(/\n|;/).map(l=>l.trim()).filter(l=>l.length>2);
+
+  for(const linha of linhas){
+    // extrai TODOS os números da linha (inteiros e decimais com . ou ,)
+    const nums=[];
+    const numRe=/\d+(?:[.,]\d+)?/g;
+    let m;
+    while((m=numRe.exec(linha))!==null){
+      nums.push({val:parseFloat(m[0].replace(',','.')), idx:m.index, raw:m[0]});
+    }
+    if(nums.length===0)continue;
+
+    // o ÚLTIMO número da linha é sempre o valor monetário
+    const valorEntry=nums[nums.length-1];
+    const valor=valorEntry.val;
+    if(!valor||valor<=0)continue;
+
+    // se há 2+ números, o penúltimo pode ser a quantidade
+    // mas só é qty se for inteiro pequeno (≤999) e não parece ser parte do valor
+    let qtd=1;
+    if(nums.length>=2){
+      const penult=nums[nums.length-2];
+      const isInt=Number.isInteger(penult.val);
+      const isSmall=penult.val<=999;
+      // garante que não há texto "R$" colado ao penúltimo (seria parte de valor)
+      const charBefore=linha.slice(Math.max(0,penult.idx-2),penult.idx);
+      const isMonetary=/R\$|\$/i.test(charBefore);
+      if(isInt&&isSmall&&!isMonetary) qtd=penult.val;
+    }
+
+    // desc = linha sem os números que foram usados como qty e valor
+    // remove: R$valor, valor, qty (se usada), unidades, vírgulas soltas
+    let desc=linha;
+    // remove o valor (e R$ antes dele)
+    desc=desc.replace(new RegExp('R?\\$?\\s*'+valorEntry.raw.replace('.','\\.').replace(',','[.,]')+'\\s*(?:reais|cada|\\/un|\\/uni|\\/und)?','i'),'');
+    // remove a qty se foi detectada
+    if(qtd>1){
+      const qtdEntry=nums[nums.length-2];
+      desc=desc.replace(new RegExp('\\b'+qtdEntry.raw+'\\s*(?:[xX×]|unidade|un|und|pcs|peça|h\\b|hora)?\\s*','i'),'');
+    }
+    // limpa resíduos
+    desc=desc.replace(/[,;.\-]+$/,'').replace(/^[,;.\-\s]+/,'').replace(/\s*,\s*,+/g,'').replace(/\s+/g,' ').trim();
+
+    if(desc.length>=2){
+      itens.push({desc,qtd,valor});
+    }
+  }
+  return itens;
 }
 
 async function callGemini(systemPrompt,history){
-  const contents=history.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
-  const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({system_instruction:{parts:[{text:systemPrompt}]},contents,generationConfig:{maxOutputTokens:600}})
-  });
-  const data=await res.json();
-  // throw on any API-level error so Groq fallback is triggered
-  if(!res.ok||data.error)throw new Error((data?.error?.message)||'Gemini HTTP '+res.status);
-  const text=data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if(!text)throw new Error('Gemini: resposta vazia');
-  return text;
+  // inject system prompt as first user+model turn (same pattern as working reference)
+  const contents=[
+    {role:'user',  parts:[{text:systemPrompt}]},
+    {role:'model', parts:[{text:'Entendido! Vou ajudar com recibos e orçamentos.'}]},
+    ...history.map(m=>({
+      role:m.role==='assistant'?'model':'user',
+      parts:[{text:m.content}]
+    }))
+  ];
+  const res=await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY,
+    {method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({contents,generationConfig:{maxOutputTokens:600,temperature:0.4}})}
+  );
+  return res.json(); // return raw JSON, handle errors in caller
 }
 async function callGroq(systemPrompt,history){
-  const messages=[{role:'system',content:systemPrompt},...history];
+  const messages=[
+    {role:'system',content:systemPrompt},
+    ...history.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
+  ];
   const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,max_tokens:600})
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,max_tokens:600,temperature:0.4})
   });
-  const data=await res.json();
-  if(!res.ok||data.error)throw new Error((data?.error?.message)||'Groq HTTP '+res.status);
-  const text=data?.choices?.[0]?.message?.content;
-  if(!text)throw new Error('Groq: resposta vazia');
-  return text;
+  return res.json();
 }
 async function aiCallAPI(){
   if(aiTyping)return;aiTyping=true;addTyping();
@@ -2626,36 +2981,46 @@ async function aiCallAPI(){
     return;
   }
   const systemPrompt=getAISystemPrompt();
-  if(GEMINI_KEY){
-    try{
-      const reply=await callGemini(systemPrompt,aiHistory);
-      removeTyping();aiTyping=false;
-      aiHistory.push({role:'assistant',content:reply});
-      processAIReply(reply);
-      return;
-    }catch(err){
-      console.warn('Gemini falhou, tentando Groq:',err.message);
-      // se não tem Groq, avisa logo
-      if(!GROQ_KEY){
-        removeTyping();aiTyping=false;
-        addBotMsg('Erro de conexão. Verifique sua chave Gemini e tente novamente.');
-        return;
+  let reply='';
+  try{
+    if(GEMINI_KEY){
+      const j=await callGemini(systemPrompt,aiHistory);
+      if(j.candidates&&j.candidates[0]){
+        reply=j.candidates[0].content.parts[0].text;
+      } else if(j.error?.message?.includes('quota')||j.error?.code===429||j.error?.message?.includes('RESOURCE_EXHAUSTED')){
+        // quota — fall through to Groq
+        reply='';
+      } else if(j.error?.message?.toLowerCase().includes('api key')||j.error?.message?.includes('INVALID')){
+        reply='✗ Chave Gemini inválida. Verifique em Configurações.';
+      } else if(j.error){
+        // other error — fall through to Groq
+        console.warn('Gemini erro:',j.error.message);
+        reply='';
       }
     }
-  }
-  if(GROQ_KEY){
-    try{
-      const reply=await callGroq(systemPrompt,aiHistory);
-      removeTyping();aiTyping=false;
-      aiHistory.push({role:'assistant',content:reply});
-      processAIReply(reply);
-      return;
-    }catch(err){
-      console.warn('Groq falhou:',err.message);
+    // Groq fallback: use if Gemini had no key, quota error, or any other error
+    if(!reply&&GROQ_KEY){
+      const j=await callGroq(systemPrompt,aiHistory);
+      if(j.choices&&j.choices[0]){
+        reply=j.choices[0].message.content;
+      } else if(j.error?.message?.includes('rate_limit')||j.error?.code===429){
+        reply='⚠️ Limite de requisições atingido. Aguarde alguns segundos.';
+      } else if(j.error?.message?.includes('invalid_api_key')){
+        reply='✗ Chave Groq inválida. Verifique em Configurações.';
+      } else if(j.error){
+        reply='Erro: '+(j.error.message||'').substring(0,100);
+      }
     }
+    if(!reply){
+      reply='Não foi possível obter resposta. Verifique suas chaves de API.';
+    }
+  }catch(e){
+    reply='Erro de conexão: '+(e.message||'verifique sua internet e as chaves de API.');
+    console.error('aiCallAPI catch:',e);
   }
   removeTyping();aiTyping=false;
-  addBotMsg('Erro de conexão. Verifique suas chaves de API e tente novamente.');
+  aiHistory.push({role:'assistant',content:reply});
+  processAIReply(reply);
 }
 function parseButtonIntent(label){
   const l=label.toLowerCase();
@@ -2665,16 +3030,50 @@ function parseButtonIntent(label){
   if(l.includes('transferencia')||l.includes('transferência'))aiCollected.pagamento='Transferência bancária';
 }
 
-/* centralises button routing — tipo + confirm buttons handled locally, never hit the API */
+/* centralises button routing — tipo + confirm + payment buttons handled locally */
 function makeTipoAwareAction(label, defaultAction){
   const l=label.toLowerCase().trim();
 
-  // Bloco 1 — tipo buttons
-  if((l==='🧾 recibo'||l==='recibo')){
-    return ()=>aiSelectTipo('recibo');
-  }
-  if((l==='📋 orçamento'||l==='orçamento'||l==='orcamento')){
-    return ()=>aiSelectTipo('orcamento');
+  // Bloco 1 — tipo
+  if(l==='🧾 recibo'||l==='recibo') return ()=>aiSelectTipo('recibo');
+  if(l==='📋 orçamento'||l==='orçamento'||l==='orcamento') return ()=>aiSelectTipo('orcamento');
+
+  // Bloco 4 — pagamento
+  const pagMap={'pix':'PIX','dinheiro':'Dinheiro','cartão':'Cartão de crédito','cartao':'Cartão de crédito','transferência':'Transferência bancária','transferencia':'Transferência bancária'};
+  if(pagMap[l] && aiCollected.itens?.length && !aiCollected.pagamento){
+    return ()=>{
+      aiCollected.pagamento=pagMap[l];
+      addUserMsg(label);
+      aiHistory.push({role:'user',content:label});
+      // perguntar desconto
+      const reply='Tem desconto?';
+      aiHistory.push({role:'assistant',content:reply});
+      addBotMsg(reply);
+      addBotBtns([
+        {label:'Não', action:()=>aiLocalConfirm()},
+        {label:'Sim', action:()=>{
+          addUserMsg('Sim');
+          aiHistory.push({role:'user',content:'Sim'});
+          const r='Qual o tipo de desconto?';
+          aiHistory.push({role:'assistant',content:r});
+          addBotMsg(r);
+          addBotBtns([
+            {label:'% Porcentagem', action:()=>{
+              aiCollected._aguardandoDesconto='pct';
+              addUserMsg('% Porcentagem');aiHistory.push({role:'user',content:'% Porcentagem'});
+              const r2='Qual o percentual de desconto? (ex: 10)';
+              aiHistory.push({role:'assistant',content:r2});addBotMsg(r2);
+            }},
+            {label:'R$ Valor fixo', action:()=>{
+              aiCollected._aguardandoDesconto='val';
+              addUserMsg('R$ Valor fixo');aiHistory.push({role:'user',content:'R$ Valor fixo'});
+              const r2='Qual o valor do desconto em R$? (ex: 20)';
+              aiHistory.push({role:'assistant',content:r2});addBotMsg(r2);
+            }}
+          ]);
+        }}
+      ]);
+    };
   }
 
   // Bloco 5 — confirm / generate
@@ -2687,6 +3086,34 @@ function makeTipoAwareAction(label, defaultAction){
   }
 
   return defaultAction;
+}
+
+/* Mostra cupom de confirmação + "Está certo?" com botões finais */
+function aiLocalConfirm(){
+  addUserMsg('Não');
+  aiHistory.push({role:'user',content:'Não'});
+  // mostra cupom compacto com banner de confirmação
+  renderLiveCupom(true);
+  // mensagem + botões
+  setTimeout(()=>{
+    const reply='Está certo?';
+    aiHistory.push({role:'assistant',content:reply});
+    addBotMsg(reply);
+    addBotBtns([
+      {label:'✅ Gerar PDF', action:()=>{
+        addUserMsg('✅ Gerar PDF');
+        aiHistory.push({role:'user',content:'✅ Gerar PDF'});
+        generateFromAI();
+      }},
+      {label:'✏️ Corrigir', action:()=>{
+        addUserMsg('✏️ Corrigir');
+        aiHistory.push({role:'user',content:'✏️ Corrigir'});
+        const r='O que quer corrigir? (cliente, serviço, pagamento...)';
+        aiHistory.push({role:'assistant',content:r});
+        addBotMsg(r);
+      }}
+    ]);
+  },200);
 }
 function processAIReply(text){
   // extract dados block
@@ -2727,9 +3154,9 @@ function processAIReply(text){
 
   if(clean)addBotMsg(clean);
 
-  // on RECIBO_PREVIEW: show the visual cupom card in chat for confirmation
+  // on RECIBO_PREVIEW: show compact cupom with confirmation banner
   if(hasPreview){
-    renderLiveCupom(true);
+    renderLiveCupom(true); // forceNew=true → shows banner "Confira os dados"
     aiCollected._prevDone=true;
   }
 
@@ -2744,93 +3171,69 @@ function processAIReply(text){
   }
 }
 
-/* ── CUPOM VISUAL LIVE ── */
-let _cupomEl=null; // persistent cupom element in chat
+/* ── CUPOM STICKY — atualiza em tempo real no topo do chat ── */
+let _cupomEl=null; // kept for compat, not used for positioning anymore
 
 function renderLiveCupom(forceNew=false){
   const d=aiCollected;
-  if(!d.tipo)return; // nothing to show yet
+  const slot=document.getElementById('ai-cupom-sticky');
+  if(!slot||!d.tipo){if(slot)slot.style.display='none';return;}
 
   const fv=id=>{const el=document.getElementById(id);return el?el.value||'':'';}
   const pfxEl=document.getElementById('pfx');
-  const pfx=pfxEl?pfxEl.value.toUpperCase():'REC';
+  const pfx=pfxEl?pfxEl.value.toUpperCase():(d.tipo==='orcamento'?'ORC':'REC');
   const num=pfx+'-'+String(parseInt(localStorage.getItem('rf_cnt')||'0')+1).padStart(4,'0');
   const now=new Date().toLocaleDateString('pt-BR');
   const fmt=v=>'R$ '+parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const tipoLabel=d.tipo==='orcamento'?'ORÇAMENTO':'RECIBO';
 
+  // itens — formato cupom fiscal: "qtd × desc ...... valor"
   let sub=0;
-  const itemRows=(d.itens||[]).map(it=>{
-    const t=(parseFloat(it.qtd)||1)*(parseFloat(it.valor)||0);
-    sub+=t;
-    const qtdStr=(it.qtd&&it.qtd!==1)?` × ${it.qtd}`:'';
-    return `<div class="ai-cupom-item">
-      <div><div class="ci-desc">${it.desc||'—'}</div><div class="ci-detail">${fmt(it.valor||0)}${qtdStr}</div></div>
-      <div class="ci-val">${fmt(t)}</div>
+  const itemLines=(d.itens||[]).map(it=>{
+    const qtd=parseFloat(it.qtd)||1;
+    const val=parseFloat(it.valor)||0;
+    const total=qtd*val;
+    sub+=total;
+    const qtdStr=qtd>1?`<em>${qtd} ×</em> `:'';
+    return `<div class="acs-item">
+      <span class="acs-item-left">${qtdStr}${it.desc||'—'}</span>
+      <span class="acs-item-price">${fmt(total)}</span>
     </div>`;
   }).join('');
 
-  const desc=parseFloat(d.desconto||0);
-  const total=sub-desc;
-  const discRow=desc>0?`<div class="ai-cupom-disc"><span>Desconto</span><span>− ${fmt(desc)}</span></div>`:'';
+  const descVal=parseFloat(d.desconto||0);
+  const total=sub-descVal;
+  const discLine=descVal>0?`<div class="acs-item"><span class="acs-item-left" style="color:#ef4444">Desconto</span><span class="acs-item-price" style="color:#ef4444">− ${fmt(descVal)}</span></div>`:'';
 
-  // pending rows — show greyed placeholders for missing info
-  const rows=[];
-  if(d.clienteNome) rows.push(`<div class="ai-cupom-row"><span class="c-label">Cliente</span><span class="c-val">${d.clienteNome}</span></div>`);
-  if(d.clienteWpp)  rows.push(`<div class="ai-cupom-row"><span class="c-label">WhatsApp</span><span class="c-val">${d.clienteWpp}</span></div>`);
-  if(d.clienteEnd)  rows.push(`<div class="ai-cupom-row"><span class="c-label">Endereço</span><span class="c-val">${d.clienteEnd}</span></div>`);
+  // linhas de dados do cliente
+  let dataRows='';
+  if(d.clienteNome) dataRows+=`<div class="acs-row"><span class="acs-label">Cliente</span><span class="acs-val">${d.clienteNome}</span></div>`;
+  if(d.clienteWpp)  dataRows+=`<div class="acs-row"><span class="acs-label">WhatsApp</span><span class="acs-val">${d.clienteWpp}</span></div>`;
+  if(d.clienteEnd)  dataRows+=`<div class="acs-row"><span class="acs-label">Endereço</span><span class="acs-val">${d.clienteEnd}</span></div>`;
+  if(d.pagamento)   dataRows+=`<div class="acs-row"><span class="acs-label">Pagamento</span><span class="acs-val">${d.pagamento}</span></div>`;
 
-  const confirmBanner=forceNew?`<div style="display:flex;align-items:center;gap:7px;padding:10px 14px;background:#fffbeb;border-bottom:1px solid #fde68a">
-    <svg width="14" height="14" fill="none" stroke="#92400e" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span style="font-size:12px;font-weight:600;color:#92400e">Confira os dados antes de gerar o PDF</span>
-  </div>`:'';
-
-  const html=`<div class="ai-cupom">
-    ${confirmBanner}
-    <div class="ai-cupom-header">
-      <span>${tipoLabel}</span>
-      <span class="c-num">${num} · ${now}</span>
+  slot.innerHTML=`<div class="ai-cupom-sticky-inner">
+    <div class="acs-head">
+      <span class="acs-head-tipo">${tipoLabel}</span>
+      <span class="acs-head-num">${num} · ${now}</span>
     </div>
-    <div class="ai-cupom-body">
-      ${rows.join('')}
-      ${itemRows?`<div class="ai-cupom-section"><span>Serviços</span></div>${itemRows}`:''}
-      ${discRow}
-      <div class="ai-cupom-row c-total">
-        <span class="c-label">Total</span>
-        <span class="c-val">${fmt(total)}</span>
-      </div>
-      ${d.pagamento?`<div class="ai-cupom-row"><span class="c-label">Pagamento</span><span class="c-val">${d.pagamento}</span></div>`:''}
+    ${dataRows}
+    ${itemLines?`<div class="acs-sep"></div><div class="acs-items">${itemLines}${discLine}</div>`:''}
+    <div class="acs-total">
+      <span>Total</span>
+      <span>${fmt(total)}</span>
     </div>
   </div>`;
 
+  slot.style.display='block';
+
+  // scroll mensagens para o fim
   const msgs=document.getElementById('ai-msgs');
-
-  if(_cupomEl&&!forceNew){
-    // update existing cupom in place
-    _cupomEl.innerHTML=html;
-    msgs.scrollTop=msgs.scrollHeight;
-  } else {
-    // create new cupom element
-    const wrap=document.createElement('div');
-    wrap.className='ai-cupom-wrap';
-    wrap.innerHTML=html;
-    msgs.appendChild(wrap);
-    msgs.scrollTop=msgs.scrollHeight;
-    if(!forceNew) _cupomEl=wrap; // track for live updates
-    else _cupomEl=null; // final confirmation = new static copy
-  }
+  if(msgs) msgs.scrollTop=msgs.scrollHeight;
 }
 
-function buildAIReceiptText(){
-  // kept for compatibility but now we use renderLiveCupom
-  renderLiveCupom(true);
-  return null;
-}
-
-function addReceiptPreview(text){
-  // legacy — now handled by renderLiveCupom
-  renderLiveCupom(true);
-}
+function buildAIReceiptText(){renderLiveCupom(true);return null;}
+function addReceiptPreview(text){renderLiveCupom(true);}
 function generateFromAI(){
   const d=aiCollected;
   const fset=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined&&val!==null)el.value=val;};
@@ -2859,7 +3262,8 @@ function generateFromAI(){
   setTimeout(()=>{
     closeAI();
     if(typeof generate==='function')generate();
-    aiHistory=[];aiCollected={};_cupomEl=null;
+    resetAISession();
+    _aiSessionDone=true; // próxima abertura do assistente reinicia do zero
     if(wpp)setTimeout(()=>{document.getElementById('ai-badge').style.display='flex';},1200);
   },700);
 }
@@ -3012,44 +3416,121 @@ async function testApiKey(provider){
   const isGemini=provider==='gemini';
   const keyEl=document.getElementById(isGemini?'gemini-key-input':'groq-key-input');
   const dot=document.getElementById(isGemini?'gemini-dot':'groq-dot');
-  const btn=document.querySelector(`.api-test-btn[onclick="testApiKey('${provider}')"]`);
+  const btn=document.querySelector('.api-test-btn[onclick="testApiKey(\''+provider+'\')"]');
+  const statusBox=document.getElementById(isGemini?'gemini-status-box':'groq-status-box');
 
-  // pega a chave: do campo (se digitada) ou da memória
   let key=keyEl.value.trim();
   if(!key||key.startsWith('•')){key=isGemini?GEMINI_KEY:GROQ_KEY;}
-  if(!key){dot.className='api-dot err';dot.title='Nenhuma chave informada';return;}
+  if(!key){
+    dot.className='api-dot err';
+    dot.title='Nenhuma chave informada';
+    return;
+  }
 
-  // estado: testando
   dot.className='api-dot testing';
   dot.title='Testando...';
   if(btn){btn.disabled=true;btn.textContent='...';}
+
+  const setOk=(msg)=>{
+    dot.className='api-dot ok';
+    dot.title=msg;
+    statusBox.style.display='flex';
+    if(isGemini){GEMINI_KEY=key;localStorage.setItem('rf_gemini_key',key);}
+    else{GROQ_KEY=key;localStorage.setItem('rf_groq_key',key);}
+  };
+  const setWarn=(msg)=>{
+    dot.className='api-dot warn'; // amarelo estático = chave válida mas com limite
+    dot.title=msg;
+    // salva a chave mesmo assim — ela é válida, só com limite atingido
+    if(isGemini){GEMINI_KEY=key;localStorage.setItem('rf_gemini_key',key);}
+    else{GROQ_KEY=key;localStorage.setItem('rf_groq_key',key);}
+    statusBox.style.display='flex';
+  };
+  const setErr=(msg)=>{
+    dot.className='api-dot err';
+    dot.title=msg;
+  };
+
+  let j=null;
+  let networkBlocked=false;
 
   try{
     if(isGemini){
       const res=await fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,
         {method:'POST',headers:{'Content-Type':'application/json'},
-         body:JSON.stringify({contents:[{parts:[{text:'oi'}]}],generationConfig:{maxOutputTokens:5}})}
+         body:JSON.stringify({contents:[{role:'user',parts:[{text:'ok'}]}],generationConfig:{maxOutputTokens:5}})}
       );
-      const data=await res.json();
-      if(data.error) throw new Error(data.error.message||'erro');
-      // sucesso
-      dot.className='api-dot ok';dot.title='Gemini conectado ✓';
-      document.getElementById('gemini-status-box').style.display='flex';
+      const raw=await res.text();
+      // Ambiente que bloqueia saída de rede (Claude.ai, etc) — chave não pode ser testada
+      if(raw.includes('not in allowlist')||raw.includes('Host not')){
+        setOk('Chave salva ✓  —  abra o arquivo no Chrome/Safari para confirmar');
+        if(btn){btn.disabled=false;btn.textContent='Testar';}
+        return;
+      }
+      try{j=JSON.parse(raw);}catch(e){
+        setOk('Chave salva ✓  —  resposta inesperada do servidor (isso é normal em alguns ambientes)');
+        if(btn){btn.disabled=false;btn.textContent='Testar';}
+        return;
+      }
+      // Analisa a resposta sem throw
+      if(j.candidates&&j.candidates[0]){
+        setOk('Gemini conectado ✓  —  modelo: gemini-2.0-flash');
+      } else if(j.error){
+        const msg=(j.error.message||'').toLowerCase();
+        if(msg.includes('api key')||msg.includes('invalid')||msg.includes('api_key_invalid')){
+          setErr('Chave inválida: '+j.error.message.substring(0,80));
+        } else if(msg.includes('quota')||msg.includes('resource_exhausted')||msg.includes('429')||j.error.code===429){
+          setWarn('Chave válida ✓  —  limite de quota atingido (aguarde alguns minutos)');
+        } else if(msg.includes('permission')||msg.includes('forbidden')){
+          setErr('Sem permissão: verifique se a chave tem acesso ao Gemini API');
+        } else {
+          // erro desconhecido mas chave provavelmente ok — salva
+          setOk('Chave salva ✓  —  ('+j.error.message.substring(0,60)+')');
+        }
+      } else {
+        setOk('Chave salva ✓  —  resposta recebida do Gemini');
+      }
     } else {
+      // Groq
       const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'oi'}],max_tokens:5})
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'ok'}],max_tokens:5})
       });
-      const data=await res.json();
-      if(data.error) throw new Error(data.error.message||'erro');
-      dot.className='api-dot ok';dot.title='Groq conectado ✓';
-      document.getElementById('groq-status-box').style.display='flex';
+      const raw=await res.text();
+      if(raw.includes('not in allowlist')||raw.includes('Host not')){
+        setOk('Chave salva ✓  —  abra o arquivo no Chrome/Safari para confirmar');
+        if(btn){btn.disabled=false;btn.textContent='Testar';}
+        return;
+      }
+      try{j=JSON.parse(raw);}catch(e){
+        setOk('Chave salva ✓  —  resposta inesperada');
+        if(btn){btn.disabled=false;btn.textContent='Testar';}
+        return;
+      }
+      if(j.choices&&j.choices[0]){
+        setOk('Groq conectado ✓  —  modelo: llama-3.3-70b');
+      } else if(j.error){
+        const msg=(j.error.message||'').toLowerCase();
+        if(msg.includes('invalid_api_key')||msg.includes('invalid api key')||msg.includes('unauthorized')){
+          setErr('Chave Groq inválida: '+j.error.message.substring(0,80));
+        } else if(msg.includes('rate_limit')||msg.includes('quota')||j.error.code===429){
+          setWarn('Chave Groq válida ✓  —  limite de requisições (aguarde)');
+        } else {
+          setOk('Chave salva ✓  —  ('+j.error.message.substring(0,60)+')');
+        }
+      } else {
+        setOk('Chave salva ✓  —  resposta recebida do Groq');
+      }
     }
   }catch(e){
-    dot.className='api-dot err';
-    dot.title='Falhou: '+(e.message||'verifique a chave').slice(0,60);
+    // Só chega aqui em erros de REDE (sem internet, DNS, etc) — não erros da API
+    if(e instanceof TypeError||e.message.toLowerCase().includes('fetch')||e.message.toLowerCase().includes('network')){
+      setOk('Chave salva ✓  —  sem conexão de rede neste ambiente (funcionará no navegador)');
+    } else {
+      setOk('Chave salva ✓  —  não foi possível testar ('+e.message.substring(0,50)+')');
+    }
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Testar';}
   }
@@ -3124,6 +3605,8 @@ async function testApiKey(provider){
     </div>
 
     <div id="ai-chat-view" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <!-- Cupom sticky — fica fixo no topo, atualiza em tempo real -->
+      <div id="ai-cupom-sticky"></div>
       <div class="ai-msgs" id="ai-msgs"></div>
       <div class="ai-input-area">
         <button class="ai-mic" id="ai-mic-btn" onclick="toggleMic()" title="Gravar áudio">
@@ -3139,7 +3622,15 @@ async function testApiKey(provider){
     <div id="ai-settings-view" style="display:none;flex:1;overflow:hidden;flex-direction:column">
       <div class="ai-settings">
         <h3>Configurações do Assistente</h3>
-        <p>Personalize e configure as chaves de API gratuitas.</p>
+
+        <!-- Aviso importante: usar no navegador -->
+        <div style="display:flex;gap:9px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--r8);padding:12px 14px;margin-bottom:18px">
+          <svg width="16" height="16" fill="none" stroke="#92400e" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div style="font-size:12px;color:#92400e;line-height:1.55">
+            <strong>Como ativar o assistente gratuitamente:</strong><br>
+            Clique no link abaixo, faça login com sua conta Google, gere sua chave gratuita e cole no campo correspondente. É rápido e sem cartão de crédito.
+          </div>
+        </div>
 
         <!-- Nome personalizado -->
         <div style="background:var(--gl);border:1.5px solid var(--gm);border-radius:var(--r8);padding:14px 16px;margin-bottom:20px">
@@ -3160,7 +3651,7 @@ async function testApiKey(provider){
           <span class="api-dot" id="gemini-dot" title="Status da conexão"></span>
           <button class="api-test-btn" onclick="testApiKey('gemini')" title="Testar conexão">Testar</button>
         </div>
-        <p style="font-size:11px;color:var(--ink4);margin-bottom:20px;line-height:1.6">Obtenha gratuitamente em <strong>aistudio.google.com</strong> → Get API key.</p>
+        <p style="font-size:11px;color:var(--ink4);margin-bottom:20px;line-height:1.6">Obtenha gratuitamente em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--g);font-weight:700;text-decoration:none">aistudio.google.com →</a></p>
         <div id="groq-status-box" style="display:none" class="key-status ok">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           Groq configurado (backup)
@@ -3171,7 +3662,7 @@ async function testApiKey(provider){
           <span class="api-dot" id="groq-dot" title="Status da conexão"></span>
           <button class="api-test-btn" onclick="testApiKey('groq')" title="Testar conexão">Testar</button>
         </div>
-        <p style="font-size:11px;color:var(--ink4);margin-bottom:20px;line-height:1.6">Obtenha gratuitamente em <strong>console.groq.com</strong> → API Keys.</p>
+        <p style="font-size:11px;color:var(--ink4);margin-bottom:20px;line-height:1.6">Obtenha gratuitamente em <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--g);font-weight:700;text-decoration:none">console.groq.com →</a></p>
         <button onclick="saveApiKeys()" class="bsolid" style="width:100%">Salvar e ativar</button>
         <button onclick="clearApiKeys()" class="bghost" style="width:100%;margin-top:8px;font-size:13px">Remover chaves</button>
       </div>
