@@ -369,15 +369,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 
 /* ── PREVIEW ── */
 .pbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
-.pshell{background:#fff;border:1px solid var(--ln);border-radius:var(--r16);overflow:visible;box-shadow:var(--shm)}
-.pshell>div{border-radius:var(--r16);overflow:hidden}
+.pshell{background:#fff;border:1px solid var(--ln);border-radius:var(--r16);overflow:hidden;box-shadow:var(--shm)}
 
-/* Mobile doc zoom — scales receipt to fit screen width, no horizontal scroll */
-.doc-scale-wrap{width:100%;overflow:hidden}
-.doc-scale-inner{transform-origin:top left;width:100%}
+/* Iframe viewer — scales 794px doc to fit any screen */
+#doc-frame{width:794px;border:none;display:block;transform-origin:top left;transition:none}
 @media(max-width:680px){
-  .pshell{border-radius:var(--r12);overflow:hidden}
-  .pshell>div{border-radius:0}
+  .pshell{border-radius:var(--r12)}
 }
 
 /* ── WA SEND CARD ── */
@@ -1143,7 +1140,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       </button>
     </div>
   </div>
-  <div class="pshell doc-scale-wrap"><div class="doc-scale-inner" id="doc-out"></div></div>
+  <div class="pshell" id="doc-preview-shell" style="overflow:hidden;padding:0;background:#fff">
+    <iframe id="doc-frame" scrolling="no" style="border:none;display:block;width:794px;transform-origin:top left;"></iframe>
+  </div>
 </div>
 
 
@@ -1176,6 +1175,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <button class="mp-back" onclick="goBack()">←</button>
     <span class="mp-title">Clientes</span>
     <span id="cli-count-badge" style="font-size:12px;color:var(--ink4)"></span>
+    <button onclick="openCliNew()" style="margin-left:auto;display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--g);color:#fff;border:none;border-radius:var(--r8);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.background='var(--gd)'" onmouseout="this.style.background='var(--g)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Novo cliente
+    </button>
   </div>
   <div class="mp-body">
     <div class="mp-search-wrap">
@@ -1753,6 +1756,9 @@ function newDoc(){
 function duplicateDoc(){if(!currentDocData){return;}let dup=JSON.parse(JSON.stringify(currentDocData));dup.docNum=null;restoreSnapshot(dup);_editingDocNum=null;goTo('form');toast('Duplicado! Edite e gere o novo documento','green');}
 
 /* ── GENERATE ── */
+/* ── hidden div keeps HTML for PDF generation (off-screen) ── */
+let _docHtml='';
+
 function generate(){
   const wasEditing=!!_editingDocNum;
   let docNum=_editingDocNum||bumpCnt();
@@ -1764,43 +1770,52 @@ function generate(){
   saveItemHistory(d.items);
   saveDocToHist(d);
   currentDocData={...d,sigUrl};
-  let html=d.tplId==='wv'?tplWave(d,sigUrl):tplClassic(d,sigUrl);
-  document.getElementById('doc-out').innerHTML=html;
+  _docHtml=d.tplId==='wv'?tplWave(d,sigUrl):tplClassic(d,sigUrl);
+
+  // write into iframe
+  const frame=document.getElementById('doc-frame');
+  if(frame){
+    const fullHtml=`<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{margin:0;background:#fff}</style>
+</head><body>${_docHtml}</body></html>`;
+    frame.srcdoc=fullHtml;
+    frame.onload=()=>{
+      // set iframe height to content height
+      try{
+        const h=frame.contentDocument.body.scrollHeight;
+        frame.style.height=h+'px';
+      }catch(e){}
+      scaleIframeToFit();
+    };
+  }
+
   if(d.cliTel)document.getElementById('wa-num-input').value=d.cliTel;
   hasDoc=true;
   document.getElementById('tn-prev').style.display='';
   if(wasEditing){
     toast('Documento salvo com sucesso!','green');
-    goTo('docs'); // volta para a lista após salvar edição
+    goTo('docs');
   } else {
     goTo('preview');
     toast('Documento gerado com sucesso!','green');
   }
-  setTimeout(scaleDocForMobile,80);
 }
 
-/* Escala o recibo para caber na tela em mobile sem scroll lateral */
-function scaleDocForMobile(){
-  const inner=document.getElementById('doc-out');
-  const wrap=inner?.parentElement;
-  if(!inner||!wrap)return;
-  // reset first
-  inner.style.transform='';
-  inner.style.width='';
-  const wrapW=wrap.offsetWidth;
-  const docW=inner.scrollWidth;
-  if(docW>wrapW&&wrapW>0){
-    const scale=wrapW/docW;
-    inner.style.transformOrigin='top left';
-    inner.style.transform=`scale(${scale})`;
-    inner.style.width=(100/scale)+'%';
-    // adjust wrap height to match scaled content
-    wrap.style.height=(inner.scrollHeight*scale)+'px';
-  }else{
-    wrap.style.height='';
-  }
+/* Scale the 794px iframe to fit the shell width — no content distortion */
+function scaleIframeToFit(){
+  const frame=document.getElementById('doc-frame');
+  const shell=document.getElementById('doc-preview-shell');
+  if(!frame||!shell)return;
+  const shellW=shell.offsetWidth||shell.getBoundingClientRect().width;
+  if(!shellW)return;
+  const scale=Math.min(1,shellW/794);
+  frame.style.transform=`scale(${scale})`;
+  frame.style.width='794px';
+  // shrink shell height to match scaled iframe
+  const frameH=parseFloat(frame.style.height)||794;
+  shell.style.height=(frameH*scale)+'px';
 }
-window.addEventListener('resize',()=>setTimeout(scaleDocForMobile,60));
+window.addEventListener('resize',()=>setTimeout(scaleIframeToFit,60));
 
 /* ── PDF (jsPDF + html2canvas) ── */
 async function generatePDF(){
@@ -1809,9 +1824,9 @@ async function generatePDF(){
   overlay.classList.add('on');
   await new Promise(r=>setTimeout(r,120));
   try{
-    // Cria clone off-screen com largura fixa A4 para captura fiel
-    let source=document.getElementById('doc-out');
-    let clone=source.cloneNode(true);
+    // Cria div off-screen com o HTML do documento em 794px — independente do iframe
+    let clone=document.createElement('div');
+    clone.innerHTML=_docHtml;
     clone.style.cssText='position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;';
     document.body.appendChild(clone);
     // Aguarda render do clone
@@ -1940,17 +1955,84 @@ function sigBlock(sigUrl,ac,isWave=false){
 function tplWave(d,sigUrl){
   let ac='#1D9E75',acd='#0d7a59';
   let logoBlock=logoData?`<div style="margin-bottom:10px"><img src="${logoData}" style="max-height:68px;max-width:180px;object-fit:contain;display:block"/></div>`:`` ;
-  let itemRows=d.items.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#F9FAFB'}"><td style="padding:11px 14px;font-size:14px;font-weight:700;color:#374151;border-bottom:1px solid #F3F4F6;width:6%">${it.no}.</td><td style="padding:11px 14px;font-size:14px;color:#111;font-weight:500;border-bottom:1px solid #F3F4F6">${it.desc}</td><td style="padding:11px 14px;font-size:14px;color:#374151;text-align:center;border-bottom:1px solid #F3F4F6;width:12%">${it.q} pcs</td><td style="padding:11px 14px;font-size:14px;color:#374151;text-align:right;border-bottom:1px solid #F3F4F6;width:16%">${fmtR(it.u)}</td><td style="padding:11px 14px;font-size:14px;font-weight:700;color:#111;text-align:right;border-bottom:1px solid #F3F4F6;width:16%">${fmtR(it.t)}</td></tr>`).join('');
-  let vencBlock=d.tipo==='orcamento'&&d.venc?`<div style="padding:0 20px;border-right:1px solid #E5E7EB"><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Válido até</div><div style="font-size:14px;font-weight:700;color:#111">${d.venc}</div></div>`:'';
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;width:100%;overflow:hidden">
-  <div style="padding:32px 40px 28px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #F3F4F6"><div>${logoBlock}<div style="font-size:18px;font-weight:800;color:#111;letter-spacing:-.3px">${d.nome}</div><div style="font-size:12px;color:#9CA3AF;letter-spacing:.8px;margin-top:2px;text-transform:uppercase">Profissional</div></div><div style="text-align:right"><div style="font-size:38px;font-weight:900;color:#111;letter-spacing:-1px;line-height:1">${d.tit}</div><div style="font-size:14px;color:#6B7280;margin-top:6px;font-weight:500">${d.docNum}${d.stBadge}</div></div></div>
-  <div style="padding:0 40px;background:#FAFAFA;border-bottom:1px solid #F3F4F6"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:16px 0"><div style="padding-right:20px;border-right:1px solid #E5E7EB"><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Nº do documento</div><div style="font-size:14px;font-weight:700;color:#111">${d.docNum}</div></div><div style="padding:0 20px;border-right:1px solid #E5E7EB"><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div><div style="font-size:14px;font-weight:700;color:#111">${d.cli}</div><div style="font-size:12px;color:#9CA3AF;margin-top:2px;line-height:1.5">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div></div><div style="padding:0 20px;border-right:1px solid #E5E7EB"><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Data</div><div style="font-size:14px;font-weight:700;color:#111">${d.data}</div></div>${vencBlock}<div style="padding-left:20px"><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Pagamento</div><div style="font-size:14px;font-weight:700;color:#111">${d.pag}</div></div></div></div>
-  <div style="padding:24px 40px 0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:${ac}"><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Nº</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Descrição</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:center;letter-spacing:.5px;text-transform:uppercase">Qtd</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Valor unit.</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Total</th></tr></thead><tbody>${itemRows}</tbody></table></div>
-  <div style="padding:16px 40px 0;display:flex;justify-content:flex-end"><div style="min-width:260px"><div style="display:flex;justify-content:space-between;font-size:14px;color:#9CA3AF;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Subtotal</span><span>${fmtR(d.sub)}</span></div>${d.discAmt>0?`<div style="display:flex;justify-content:space-between;font-size:14px;color:#ef4444;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Desconto</span><span>− ${fmtR(d.discAmt)}</span></div>`:''}<div style="display:flex;justify-content:space-between;padding:10px 0 4px;border-top:2px solid ${ac};margin-top:4px"><span style="font-size:16px;font-weight:800;color:#111">TOTAL GERAL</span><span style="font-size:16px;font-weight:800;color:${ac}">${fmtR(d.total)}</span></div></div></div>
-  <div style="padding:20px 40px 0">${d.obs?`<div style="margin-bottom:20px"><div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Termos &amp; Condições</div><div style="font-size:13px;color:#6B7280;line-height:1.7">${d.obs.replace(/\n/g,'<br>')}</div></div>`:''} ${sigBlock(sigUrl,ac,false)}</div>
-  <div style="height:52px"></div>
-  <div style="line-height:0"><svg viewBox="0 0 800 80" preserveAspectRatio="none" style="width:100%;height:80px;display:block"><path d="M0,30 C133,65 267,5 400,35 C533,70 667,5 800,35 L800,80 L0,80 Z" fill="${ac}" opacity=".35"/><path d="M0,50 C150,20 300,70 450,45 C600,20 720,60 800,40 L800,80 L0,80 Z" fill="${acd}"/></svg></div>
-  <div style="background:${acd};padding:20px 40px 24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px"><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:2.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">${d.nome?`<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">${d.nome}</div>`:''} ${d.tel?`<div style="display:flex;align-items:center;gap:6px"><span style="opacity:.6;font-size:11px">TEL</span>${d.tel}</div>`:''} ${d.email?`<div style="display:flex;align-items:center;gap:6px"><span style="opacity:.6;font-size:11px">EMAIL</span>${d.email}</div>`:''} ${d.site?`<div style="display:flex;align-items:center;gap:6px"><span style="opacity:.6;font-size:11px">SITE</span>${d.site}</div>`:''} ${d.insta?`<div style="display:flex;align-items:center;gap:6px"><span style="opacity:.6;font-size:11px">INSTA</span>${d.insta}</div>`:''} ${d.end?`<div style="display:flex;align-items:center;gap:6px"><span style="opacity:.6;font-size:11px">END.</span>${d.end}</div>`:''}</div><div style="text-align:right;font-size:12px;color:rgba(255,255,255,.5);line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"><div style="font-size:13px;color:rgba(255,255,255,.7);font-weight:600">${d.docNum}</div><div>${d.data}</div><div style="margin-top:4px;font-size:11px;opacity:.4">recibofácil</div></div></div>
+  let itemRows=d.items.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#F9FAFB'}"><td style="padding:11px 14px;font-size:14px;font-weight:700;color:#1f2937;border-bottom:1px solid #F3F4F6;width:6%">${it.no}.</td><td style="padding:11px 14px;font-size:14px;color:#111;font-weight:500;border-bottom:1px solid #F3F4F6">${it.desc}</td><td style="padding:11px 14px;font-size:14px;color:#374151;text-align:center;border-bottom:1px solid #F3F4F6;width:12%">${it.q} pcs</td><td style="padding:11px 14px;font-size:14px;color:#374151;text-align:right;border-bottom:1px solid #F3F4F6;width:16%">${fmtR(it.u)}</td><td style="padding:11px 14px;font-size:14px;font-weight:700;color:#111;text-align:right;border-bottom:1px solid #F3F4F6;width:16%">${fmtR(it.t)}</td></tr>`).join('');
+  let vencBlock=d.tipo==='orcamento'&&d.venc?`<div style="padding:0 20px;border-right:1px solid #E5E7EB"><div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Válido até</div><div style="font-size:14px;font-weight:700;color:#111">${d.venc}</div></div>`:'';
+
+  // dados do prestador para o cabeçalho (compacto, linha a linha)
+  const provLines=[
+    d.cpf   ?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">DOC</span><span style="font-size:12px;color:#374151">${d.cpf}</span></div>`:'',
+    d.tel   ?`<div style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">TEL</span><span style="font-size:12px;color:#374151">${d.tel}</span></div>`:'',
+    d.email ?`<div style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">EMAIL</span><span style="font-size:12px;color:#374151">${d.email}</span></div>`:'',
+    d.end   ?`<div style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">END.</span><span style="font-size:12px;color:#374151">${d.end}</span></div>`:'',
+    d.site  ?`<div style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">SITE</span><span style="font-size:12px;color:#374151">${d.site}</span></div>`:'',
+    d.insta ?`<div style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="font-size:10px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.5px;min-width:36px">INSTA</span><span style="font-size:12px;color:#374151">${d.insta}</span></div>`:''
+  ].filter(Boolean).join('');
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;width:100%;overflow:hidden;min-height:1122px;display:flex;flex-direction:column">
+
+  <!-- Cabeçalho: logo+nome (esq) | título+nº (dir) -->
+  <div style="padding:32px 40px 28px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #F3F4F6">
+    <div>${logoBlock}<div style="font-size:18px;font-weight:800;color:#111;letter-spacing:-.3px">${d.nome}</div></div>
+    <div style="text-align:right">
+      <div style="font-size:38px;font-weight:900;color:#111;letter-spacing:-1px;line-height:1">${d.tit}</div>
+      <div style="font-size:14px;color:#374151;margin-top:5px;font-weight:600">${d.docNum}${d.stBadge}</div>
+    </div>
+  </div>
+
+  <!-- Barra de info: Nº doc | Cliente | Data | Pagamento | Prestador -->
+  <div style="padding:0 40px;background:#FAFAFA;border-bottom:1px solid #F3F4F6">
+    <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1.4fr;gap:0;padding:16px 0">
+      <div style="padding-right:20px;border-right:1px solid #E5E7EB">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Nº do documento</div>
+        <div style="font-size:14px;font-weight:700;color:#111">${d.docNum}</div>
+      </div>
+      <div style="padding:0 20px;border-right:1px solid #E5E7EB">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div>
+        <div style="font-size:14px;font-weight:700;color:#111">${d.cli}</div>
+        <div style="font-size:12px;color:#374151;margin-top:2px;line-height:1.5">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div>
+      </div>
+      <div style="padding:0 20px;border-right:1px solid #E5E7EB">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Data</div>
+        <div style="font-size:14px;font-weight:700;color:#111">${d.data}</div>
+      </div>
+      ${vencBlock}
+      <div style="padding:0 20px;border-right:1px solid #E5E7EB">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Pagamento</div>
+        <div style="font-size:14px;font-weight:700;color:#111">${d.pag}</div>
+      </div>
+      <div style="padding-left:20px">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Prestador</div>
+        ${provLines}
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo (cresce para empurrar rodapé para baixo) -->
+  <div style="flex:1">
+
+    <!-- Tabela de itens -->
+    <div style="padding:24px 40px 0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:${ac}"><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Nº</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Descrição</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:center;letter-spacing:.5px;text-transform:uppercase">Qtd</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Valor unit.</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Total</th></tr></thead><tbody>${itemRows}</tbody></table></div>
+
+    <!-- Totais -->
+    <div style="padding:16px 40px 0;display:flex;justify-content:flex-end"><div style="min-width:260px"><div style="display:flex;justify-content:space-between;font-size:14px;color:#374151;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Subtotal</span><span>${fmtR(d.sub)}</span></div>${d.discAmt>0?`<div style="display:flex;justify-content:space-between;font-size:14px;color:#ef4444;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Desconto</span><span>− ${fmtR(d.discAmt)}</span></div>`:''}<div style="display:flex;justify-content:space-between;padding:10px 0 4px;border-top:2px solid ${ac};margin-top:4px"><span style="font-size:16px;font-weight:800;color:#111">TOTAL GERAL</span><span style="font-size:16px;font-weight:800;color:${ac}">${fmtR(d.total)}</span></div></div></div>
+
+    <!-- Obs + Assinatura -->
+    <div style="padding:20px 40px 0">${d.obs?`<div style="margin-bottom:20px"><div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Termos &amp; Condições</div><div style="font-size:13px;color:#374151;line-height:1.7">${d.obs.replace(/\n/g,'<br>')}</div></div>`:''} ${sigBlock(sigUrl,ac,false)}</div>
+
+  </div>
+
+  <!-- Rodapé fixo no fundo da folha: onda mais visível + barra verde -->
+  <div style="line-height:0;margin-top:auto">
+    <svg viewBox="0 0 800 60" preserveAspectRatio="none" style="width:100%;height:60px;display:block">
+      <path d="M0,20 C100,50 200,5 400,25 C600,45 700,5 800,25 L800,60 L0,60 Z" fill="${ac}" opacity=".45"/>
+      <path d="M0,35 C150,10 300,48 450,30 C600,12 700,42 800,28 L800,60 L0,60 Z" fill="${acd}"/>
+    </svg>
+    <div style="background:${acd};padding:11px 40px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:500">${d.docNum} &nbsp;·&nbsp; ${d.data}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5)">recibofácil</div>
+    </div>
+  </div>
+
 </div>`;
 }
 
@@ -1960,18 +2042,18 @@ function tplClassic(d,sigUrl){
   let ac=t==='mo'?'#1D9E75':t==='pr'?'#534AB7':'#374151';
   let hStyle=t==='pr'?`border-left:6px solid ${ac};padding-left:22px`:t==='mo'?`border-top:4px solid ${ac};padding-top:22px`:`border-bottom:2px solid #E5E7EB;padding-bottom:22px`;
   let logoBlock=logoData?`<img src="${logoData}" style="max-height:60px;max-width:170px;object-fit:contain;display:block;margin-bottom:10px"/>`:'' ;
-  let itemRows=d.items.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#FAFAFA'}"><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#374151">${it.desc}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#6B7280;text-align:center">${it.q}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#6B7280;text-align:right">${fmtR(it.u)}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;font-weight:700;color:#111;text-align:right">${fmtR(it.t)}</td></tr>`).join('');
-  let vencRow=d.tipo==='orcamento'&&d.venc?`<div style="font-size:13px;color:#9CA3AF;margin-top:3px">Válido até ${d.venc}</div>`:'';
-  let instaBlock=d.insta?`<span style="font-size:12px;color:#D1D5DB">${d.insta}</span> &nbsp;·&nbsp; `:'';
-  let siteBlock=d.site?`<span style="font-size:12px;color:#D1D5DB">${d.site}</span> &nbsp;·&nbsp; `:'';
+  let itemRows=d.items.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#FAFAFA'}"><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#1f2937">${it.desc}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#374151;text-align:center">${it.q}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;color:#374151;text-align:right">${fmtR(it.u)}</td><td style="padding:11px 12px;border-bottom:1px solid #F3F4F6;font-size:15px;font-weight:700;color:#111;text-align:right">${fmtR(it.t)}</td></tr>`).join('');
+  let vencRow=d.tipo==='orcamento'&&d.venc?`<div style="font-size:13px;color:#374151;margin-top:3px">Válido até ${d.venc}</div>`:'';
+  let instaBlock=d.insta?`<span style="font-size:12px;color:#4B5563">${d.insta}</span> &nbsp;·&nbsp; `:'';
+  let siteBlock=d.site?`<span style="font-size:12px;color:#4B5563">${d.site}</span> &nbsp;·&nbsp; `:'';
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111;padding:44px;max-width:740px;margin:0 auto">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;${hStyle}"><div>${logoBlock}<div style="font-size:18px;font-weight:800;color:#111">${d.nome}</div><div style="font-size:13px;color:#9CA3AF;line-height:1.8;margin-top:4px">${[d.cpf,d.email,d.tel].filter(Boolean).join('<br>')}</div></div><div style="text-align:right"><div style="font-size:38px;font-weight:900;color:${ac};letter-spacing:-1px">${d.tit}</div><div style="font-size:15px;color:#9CA3AF;margin-top:5px">${d.docNum}${d.stBadge}</div><div style="font-size:13px;color:#C0C0C0;margin-top:3px">${d.data}</div>${vencRow}</div></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px;padding:18px;background:#FAFAFA;border-radius:10px;border:1px solid #F3F4F6"><div><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div><div style="font-size:16px;font-weight:700;color:#111">${d.cli}</div><div style="font-size:13px;color:#9CA3AF;margin-top:3px;line-height:1.6">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div></div><div><div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Pagamento</div><div style="font-size:16px;font-weight:700;color:#111">${d.pag}</div><div style="font-size:13px;color:#9CA3AF;margin-top:3px">${d.data}</div></div></div>
-  <table style="width:100%;border-collapse:collapse;margin-bottom:22px"><thead><tr style="border-bottom:2px solid ${ac}"><th style="font-size:12px;font-weight:700;color:#9CA3AF;text-align:left;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Descrição</th><th style="font-size:12px;font-weight:700;color:#9CA3AF;text-align:center;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Qtd</th><th style="font-size:12px;font-weight:700;color:#9CA3AF;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Unit.</th><th style="font-size:12px;font-weight:700;color:#9CA3AF;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Total</th></tr></thead><tbody>${itemRows}</tbody></table>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:26px"><div style="min-width:260px"><div style="display:flex;justify-content:space-between;font-size:14px;color:#9CA3AF;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Subtotal</span><span>${fmtR(d.sub)}</span></div>${d.discAmt>0?`<div style="display:flex;justify-content:space-between;font-size:14px;color:#ef4444;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Desconto</span><span>− ${fmtR(d.discAmt)}</span></div>`:''}<div style="display:flex;justify-content:space-between;font-size:21px;font-weight:900;color:#111;padding:10px 0 4px;border-top:2px solid ${ac};margin-top:6px"><span>Total</span><span style="color:${ac}">${fmtR(d.total)}</span></div></div></div>
-  ${d.obs?`<div style="font-size:14px;color:#6B7280;padding:14px 18px;background:#FAFAFA;border-left:3px solid ${ac};border-radius:0 8px 8px 0;margin-bottom:22px;line-height:1.7">${d.obs.replace(/\n/g,'<br>')}</div>`:''}
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;${hStyle}"><div>${logoBlock}<div style="font-size:18px;font-weight:800;color:#111">${d.nome}</div><div style="font-size:13px;color:#374151;line-height:1.8;margin-top:4px">${[d.cpf,d.email,d.tel].filter(Boolean).join('<br>')}</div></div><div style="text-align:right"><div style="font-size:38px;font-weight:900;color:${ac};letter-spacing:-1px">${d.tit}</div><div style="font-size:15px;color:#374151;margin-top:5px">${d.docNum}${d.stBadge}</div><div style="font-size:13px;color:#4B5563;margin-top:3px">${d.data}</div>${vencRow}</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px;padding:18px;background:#FAFAFA;border-radius:10px;border:1px solid #F3F4F6"><div><div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div><div style="font-size:16px;font-weight:700;color:#111">${d.cli}</div><div style="font-size:13px;color:#374151;margin-top:3px;line-height:1.6">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div></div><div><div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Pagamento</div><div style="font-size:16px;font-weight:700;color:#111">${d.pag}</div><div style="font-size:13px;color:#374151;margin-top:3px">${d.data}</div></div></div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:22px"><thead><tr style="border-bottom:2px solid ${ac}"><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:left;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Descrição</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:center;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Qtd</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Unit.</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Total</th></tr></thead><tbody>${itemRows}</tbody></table>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:26px"><div style="min-width:260px"><div style="display:flex;justify-content:space-between;font-size:14px;color:#374151;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Subtotal</span><span>${fmtR(d.sub)}</span></div>${d.discAmt>0?`<div style="display:flex;justify-content:space-between;font-size:14px;color:#ef4444;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Desconto</span><span>− ${fmtR(d.discAmt)}</span></div>`:''}<div style="display:flex;justify-content:space-between;font-size:21px;font-weight:900;color:#111;padding:10px 0 4px;border-top:2px solid ${ac};margin-top:6px"><span>Total</span><span style="color:${ac}">${fmtR(d.total)}</span></div></div></div>
+  ${d.obs?`<div style="font-size:14px;color:#374151;padding:14px 18px;background:#FAFAFA;border-left:3px solid ${ac};border-radius:0 8px 8px 0;margin-bottom:22px;line-height:1.7">${d.obs.replace(/\n/g,'<br>')}</div>`:''}
   ${sigBlock(sigUrl,ac,false)}
-  <div style="font-size:12px;color:#D1D5DB;text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #F3F4F6">${instaBlock}${siteBlock}${d.docNum} &nbsp;·&nbsp; ${d.data} &nbsp;·&nbsp; recibofácil</div>
+  <div style="font-size:12px;color:#4B5563;text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #F3F4F6">${instaBlock}${siteBlock}${d.docNum} &nbsp;·&nbsp; ${d.data} &nbsp;·&nbsp; recibofácil</div>
 </div>`;
 }
 
@@ -2271,14 +2353,35 @@ function deleteDoc(docNum) {
 }
 
 /* ══════════════════════════════════════
-   EDITAR CLIENTE
+   EDITAR / CADASTRAR CLIENTE
 ══════════════════════════════════════ */
 let _editCliIdx = null;
+let _cliNewMode = false; // true = cadastro novo, false = edição
+
+function openCliNew() {
+  _editCliIdx = null;
+  _cliNewMode = true;
+  document.getElementById('cli-edit-title').textContent = 'Novo cliente';
+  document.getElementById('ce-nome').value = '';
+  document.getElementById('ce-doc').value  = '';
+  document.getElementById('ce-tel').value  = '';
+  document.getElementById('ce-email').value = '';
+  document.getElementById('ce-end').value  = '';
+  document.getElementById('ce-obs').value  = '';
+  // esconde botão excluir no modo novo
+  const delBtn = document.getElementById('cli-edit-del-btn');
+  const saveBtn = document.getElementById('cli-edit-save-btn');
+  if(delBtn) delBtn.style.display = 'none';
+  if(saveBtn) saveBtn.textContent = 'Cadastrar cliente';
+  document.getElementById('cli-edit-overlay').classList.add('on');
+  setTimeout(()=>document.getElementById('ce-nome').focus(), 120);
+}
 
 function openCliEdit(realIdx) {
   let c = getClients()[realIdx];
   if (!c) return;
   _editCliIdx = realIdx;
+  _cliNewMode = false;
   document.getElementById('cli-edit-title').textContent = 'Editar — ' + (c.nome || 'Cliente');
   document.getElementById('ce-nome').value = c.nome || '';
   document.getElementById('ce-doc').value  = c.doc  || '';
@@ -2286,30 +2389,49 @@ function openCliEdit(realIdx) {
   document.getElementById('ce-email').value = c.email || '';
   document.getElementById('ce-end').value  = c.end  || '';
   document.getElementById('ce-obs').value  = c.obs  || '';
+  // mostra botão excluir no modo edição
+  const delBtn = document.getElementById('cli-edit-del-btn');
+  const saveBtn = document.getElementById('cli-edit-save-btn');
+  if(delBtn) delBtn.style.display = '';
+  if(saveBtn) saveBtn.textContent = 'Salvar alterações';
   document.getElementById('cli-edit-overlay').classList.add('on');
 }
 
 function closeCliEdit() {
   document.getElementById('cli-edit-overlay').classList.remove('on');
   _editCliIdx = null;
+  _cliNewMode = false;
 }
 
 function saveCliEdit() {
-  if (_editCliIdx === null) return;
-  let list = getClients();
-  if (_editCliIdx >= list.length) return;
-  list[_editCliIdx] = {
-    nome:  document.getElementById('ce-nome').value.trim(),
+  const nome = document.getElementById('ce-nome').value.trim();
+  if(!nome){ toast('Informe o nome do cliente'); document.getElementById('ce-nome').focus(); return; }
+
+  const dados = {
+    nome,
     doc:   document.getElementById('ce-doc').value.trim(),
     tel:   document.getElementById('ce-tel').value.trim(),
     email: document.getElementById('ce-email').value.trim(),
     end:   document.getElementById('ce-end').value.trim(),
     obs:   document.getElementById('ce-obs').value.trim(),
   };
-  localStorage.setItem('rf_clients', JSON.stringify(list));
-  closeCliEdit();
-  filterClientes();
-  toast('Cliente atualizado!', 'green');
+
+  if(_cliNewMode){
+    // cadastro novo — usa saveClient para deduplicar automaticamente
+    saveClient(dados);
+    closeCliEdit();
+    filterClientes();
+    toast('Cliente cadastrado!', 'green');
+  } else {
+    if (_editCliIdx === null) return;
+    let list = getClients();
+    if (_editCliIdx >= list.length) return;
+    list[_editCliIdx] = dados;
+    localStorage.setItem('rf_clients', JSON.stringify(list));
+    closeCliEdit();
+    filterClientes();
+    toast('Cliente atualizado!', 'green');
+  }
 }
 
 function confirmDeleteCliente() {
@@ -3549,14 +3671,14 @@ async function testApiKey(provider){
       <div class="cli-edit-field"><label>Nome completo</label><input id="ce-nome" placeholder="Nome do cliente"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="cli-edit-field"><label>CPF / CNPJ</label><input id="ce-doc" placeholder="000.000.000-00" oninput="maskDoc(this)"/></div>
-        <div class="cli-edit-field"><label>Telefone</label><input id="ce-tel" placeholder="(00) 00000-0000" oninput="maskTel(this)"/></div>
+        <div class="cli-edit-field"><label>Telefone / WhatsApp</label><input id="ce-tel" placeholder="(00) 00000-0000" oninput="maskTel(this)"/></div>
       </div>
       <div class="cli-edit-field"><label>E-mail</label><input id="ce-email" type="email" placeholder="cliente@email.com"/></div>
       <div class="cli-edit-field"><label>Endereço</label><input id="ce-end" placeholder="Rua, número — Cidade, UF"/></div>
       <div class="cli-edit-field"><label>Observações internas</label><textarea id="ce-obs" placeholder="Anotações internas sobre o cliente..."></textarea></div>
       <div class="cli-edit-actions">
-        <button class="cli-edit-del" onclick="confirmDeleteCliente()">🗑 Excluir</button>
-        <button class="cli-edit-save" onclick="saveCliEdit()">Salvar alterações</button>
+        <button class="cli-edit-del" id="cli-edit-del-btn" onclick="confirmDeleteCliente()">🗑 Excluir</button>
+        <button class="cli-edit-save" id="cli-edit-save-btn" onclick="saveCliEdit()">Salvar alterações</button>
       </div>
     </div>
   </div>
