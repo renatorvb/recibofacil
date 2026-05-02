@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ReciboFácil</title>
+<title>AkiRecibo</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231D9E75'/%3E%3Crect x='9' y='7' width='14' height='18' rx='2' fill='white' opacity='.95'/%3E%3Crect x='12' y='11' width='8' height='1.8' rx='.9' fill='%231D9E75'/%3E%3Crect x='12' y='14.5' width='8' height='1.8' rx='.9' fill='%231D9E75' opacity='.7'/%3E%3Crect x='12' y='18' width='5' height='1.8' rx='.9' fill='%231D9E75' opacity='.5'/%3E%3C/svg%3E"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -349,6 +349,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .sig-btn:hover{border-color:var(--ink4);color:var(--ink2)}
 .sig-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
 .sig-btn.primary:hover{background:var(--gd)}
+.sig-tabs{display:flex;border-bottom:1px solid var(--ln);background:#fff;border-radius:var(--r12) var(--r12) 0 0;overflow:hidden}
+.sig-tab{flex:1;padding:10px 12px;font-size:12.5px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--ink3);font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.sig-tab.active{color:var(--g);border-bottom-color:var(--g);background:var(--gl)}
+.sig-tab:hover:not(.active){color:var(--ink2);background:var(--ln2)}
+.sig-draw-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--ln);background:#fafafa}
+.sig-upload-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:28px 20px;cursor:pointer;color:var(--ink3);font-size:13px;text-align:center;border:1.5px dashed var(--ln);border-radius:var(--r8);margin:12px;transition:all .15s;min-height:140px}
+.sig-upload-area:hover{border-color:var(--g);color:var(--ink2);background:var(--gl)}
+.sig-preview-wrap{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.sig-preview-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:var(--ln2);border-radius:var(--r8);padding:14px;min-height:80px}
+.sig-edit-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;font-size:12px;font-weight:600;border:1.5px solid var(--ln);border-radius:var(--r8);cursor:pointer;background:#fff;color:var(--ink2);font-family:inherit;transition:all .12s;flex-shrink:0;white-space:nowrap}
+.sig-edit-btn:hover{border-color:var(--g);color:var(--g)}
 
 /* ── VALIDADE ORÇAMENTO ── */
 .venc-smart{display:none}
@@ -770,7 +781,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="b-icon">
       <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" fill="white" opacity=".9"/><rect x="6" y="6" width="8" height="1.5" rx=".75" fill="#1D9E75"/><rect x="6" y="9" width="8" height="1.5" rx=".75" fill="#1D9E75" opacity=".6"/><rect x="6" y="12" width="5" height="1.5" rx=".75" fill="#1D9E75" opacity=".4"/></svg>
     </div>
-    <span class="b-name">recibo<span>fácil</span></span>
+    <span class="b-name">Aki<span>Recibo</span></span>
   </div>
 
   <!-- Desktop nav -->
@@ -810,7 +821,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="ndh-logo">
       <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" fill="white" opacity=".9"/><rect x="6" y="6" width="8" height="1.5" rx=".75" fill="#1D9E75"/><rect x="6" y="9" width="8" height="1.5" rx=".75" fill="#1D9E75" opacity=".6"/><rect x="6" y="12" width="5" height="1.5" rx=".75" fill="#1D9E75" opacity=".4"/></svg>
     </div>
-    <span class="ndh-title">recibo<span>fácil</span></span>
+    <span class="ndh-title">Aki<span>Recibo</span></span>
     <button class="ndh-close" onclick="closeDrawer()" aria-label="Fechar menu">×</button>
   </div>
 
@@ -870,15 +881,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 <!-- ══ HOME ══ -->
 <div id="home" class="sec on">
   <div class="hero-card">
-    <h1>Recibos e orçamentos<br><em>profissionais</em> em minutos</h1>
-    <p>Com sua logo, dados salvos, numeração automática e assinatura digital. Tudo no navegador, sem cadastro.</p>
+    <h1>Recibos e Orçamentos<br><em>profissionais</em> em segundos</h1>
+    <p>Com sua logo, dados salvos, assinatura digital e controle de clientes. Rápido e fácil!</p>
     <button class="btn-cta" onclick="newDoc()">Criar documento →</button>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kv" id="kv-docs">0</div><div class="kl">Documentos emitidos</div></div>
     <div class="kpi"><div class="kv">PDF</div><div class="kl">Download real</div></div>
     <div class="kpi"><div class="kv">4</div><div class="kl">Modelos premium</div></div>
-    <div class="kpi"><div class="kv">100%</div><div class="kl">Gratuito</div></div>
+    <div class="kpi"><div class="kv">ILIMITADO</div><div class="kl">Gere qtos quiser</div></div>
   </div>
   <div class="tpl-lbl">Escolha seu modelo</div>
   <div class="tpl-row">
@@ -887,8 +898,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <div class="tm"><strong>Clássico</strong><span>Limpo e atemporal</span><span class="tbadge tg">Mais usado</span></div>
     </div>
     <div class="tc" id="tc-mo" onclick="pickTpl('mo',this)">
-      <div class="tt mo"><svg width="80" height="88" viewBox="0 0 80 88"><rect x="0" y="0" width="80" height="16" fill="#1D9E75"/><rect x="10" y="20" width="60" height="7" rx="2" fill="#9FE1CB"/><rect x="10" y="32" width="42" height="3" rx="1.5" fill="#9FE1CB"/><rect x="10" y="39" width="60" height=".8" fill="#5DCAA5"/><rect x="10" y="44" width="48" height="3" rx="1" fill="#9FE1CB"/><rect x="10" y="51" width="36" height="3" rx="1" fill="#9FE1CB"/><rect x="44" y="62" width="26" height="7" rx="3.5" fill="#1D9E75"/></svg></div>
-      <div class="tm"><strong>Verde Moderno</strong><span>Sofisticado</span><span class="tbadge ta">★ Premiado</span></div>
+      <div class="tt mo"><svg width="80" height="88" viewBox="0 0 80 88"><rect x="0" y="0" width="80" height="88" fill="#fff"/><rect x="5" y="5" width="9" height="7" rx="1.5" fill="#E5E7EB"/><rect x="5" y="14" width="22" height="2" rx="1" fill="#374151"/><rect x="5" y="17" width="16" height="1.5" rx=".75" fill="#D1D5DB"/><rect x="50" y="5" width="25" height="6" rx="1" fill="#475C6E"/><rect x="53" y="13" width="20" height="1.5" rx=".75" fill="#D1D5DB"/><rect x="56" y="16" width="14" height="1.5" rx=".75" fill="#E5E7EB"/><rect x="0" y="23" width="80" height="1" fill="#F3F4F6"/><rect x="5" y="25" width="70" height="13" rx="2" fill="#F7F9FC"/><rect x="8" y="28" width="10" height="1.5" rx=".75" fill="#9CA3AF"/><rect x="8" y="31" width="22" height="2" rx="1" fill="#374151"/><rect x="8" y="34" width="15" height="1.5" rx=".75" fill="#C5CDD7"/><rect x="5" y="41" width="70" height="6" fill="#1F2937"/><rect x="5" y="47" width="70" height="5" fill="#fff"/><rect x="5" y="52" width="70" height="5" fill="#F9FAFB"/><rect x="5" y="57" width="70" height="5" fill="#fff"/><rect x="5" y="62" width="70" height="5" fill="#F9FAFB"/><rect x="5" y="70" width="70" height="7" fill="#1F2937"/><rect x="44" y="72.5" width="28" height="2" rx="1" fill="rgba(255,255,255,.45)"/></svg></div>
+      <div class="tm"><strong>Corporativo</strong><span>Direto e formal</span><span class="tbadge ta">★ Premiado</span></div>
     </div>
     <div class="tc" id="tc-pr" onclick="pickTpl('pr',this)">
       <div class="tt pr"><svg width="80" height="88" viewBox="0 0 80 88"><rect x="0" y="0" width="9" height="88" fill="#534AB7"/><rect x="17" y="10" width="52" height="7" rx="2" fill="#AFA9EC"/><rect x="17" y="22" width="36" height="3" rx="1.5" fill="#CECBF6"/><rect x="17" y="29" width="52" height=".8" fill="#CECBF6"/><rect x="17" y="34" width="42" height="3" rx="1" fill="#CECBF6"/><rect x="17" y="41" width="32" height="3" rx="1" fill="#CECBF6"/><rect x="17" y="48" width="46" height="3" rx="1" fill="#CECBF6"/><rect x="42" y="60" width="26" height="7" rx="3.5" fill="#534AB7"/></svg></div>
@@ -1045,7 +1056,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="fr">
       <div class="fl"><label id="lbl-dt">Data de emissão</label><input id="f-data" type="date"/></div>
       <div class="fl" id="st-fl"><label>Status</label>
-        <select id="f-st"><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="parcial">Parcialmente pago</option></select>
+        <select id="f-st"><option value="pago" selected>Pago</option><option value="pendente">Pendente</option><option value="parcial">Parcialmente pago</option></select>
       </div>
     </div>
 
@@ -1078,18 +1089,60 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   <div class="fc">
     <div class="fch">
       <div class="fci"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13c2-4 4-8 6-8s1 3-1 5-4 2-5 3" stroke="#1D9E75" stroke-width="1.3" stroke-linecap="round"/><path d="M10 13h3" stroke="#1D9E75" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-      <div><h3>Assinatura digital</h3><p>Assine com o mouse ou o dedo</p></div>
+      <div><h3>Assinatura digital</h3><p>Desenhe ou suba uma imagem</p></div>
       <div style="margin-left:auto;display:flex;gap:6px">
-        <button class="sig-btn" onclick="clearSig()">Limpar</button>
         <button class="sig-btn" id="sig-toggle" onclick="toggleSig()">Adicionar ao documento</button>
       </div>
     </div>
-    <div class="sigpad-wrap">
-      <div class="sigpad-canvas-wrap">
-        <canvas id="sigCanvas" width="900" height="160"></canvas>
-        <div id="sig-ph">Assine aqui com o mouse ou dedo</div>
+
+    <!-- ESTADO A: editor (draw ou upload) — visível quando sem assinatura ou editando -->
+    <div id="sig-input-area" class="sigpad-wrap">
+      <div class="sig-tabs">
+        <button class="sig-tab active" id="sig-tab-draw" onclick="switchSigTab('draw')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Desenhar
+        </button>
+        <button class="sig-tab" id="sig-tab-upload" onclick="switchSigTab('upload')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Subir imagem
+        </button>
+      </div>
+      <!-- Painel: Desenhar -->
+      <div id="sig-panel-draw">
+        <div class="sigpad-canvas-wrap">
+          <canvas id="sigCanvas" width="900" height="160"></canvas>
+          <div id="sig-ph">Assine aqui com o mouse ou dedo</div>
+        </div>
+        <div class="sig-draw-footer">
+          <button class="sig-btn" onclick="clearSig()">Limpar</button>
+          <button class="sig-btn primary" onclick="confirmDrawnSig()">Confirmar assinatura →</button>
+        </div>
+      </div>
+      <!-- Painel: Subir imagem -->
+      <div id="sig-panel-upload" style="display:none">
+        <div class="sig-upload-area" onclick="document.getElementById('sig-file-input').click()" id="sig-drop-area">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink4)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="font-weight:600;color:var(--ink2)">Clique para selecionar a imagem</span>
+          <span style="font-size:12px">da sua assinatura digitalizada ou rubrica</span>
+          <span style="font-size:11px;color:var(--ink4)">PNG, JPG, GIF — fundo transparente recomendado</span>
+        </div>
+        <input type="file" id="sig-file-input" accept="image/*" style="display:none" onchange="handleSigImage(event)"/>
       </div>
     </div>
+
+    <!-- ESTADO B: preview da assinatura — visível quando há assinatura definida -->
+    <div id="sig-preview-area" style="display:none" class="sigpad-wrap">
+      <div class="sig-preview-wrap">
+        <div class="sig-preview-img-wrap">
+          <img id="sig-preview-img" style="max-height:80px;max-width:100%;object-fit:contain"/>
+        </div>
+        <button class="sig-edit-btn" onclick="editSig()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar
+        </button>
+      </div>
+    </div>
+
     <div style="font-size:11px;color:var(--ink4);margin-top:8px">A assinatura será incluída no documento quando "Adicionar ao documento" estiver ativo.</div>
   </div>
 
@@ -1225,6 +1278,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 /* ── STATE ── */
 let tplId='mn', tipoDoc='recibo', logoData=null, hasDoc=false;
 let discType='pct', sigEnabled=false, sigHasContent=false;
+let sigMode='draw', sigImageData=null;
 let currentDocData=null;
 let vencTipo='corridos';
 let itemIdCounter=0;
@@ -1274,6 +1328,7 @@ function goBack(){goTo(prevPage);}
 
 function pickTpl(id,el){
   tplId=id;
+  localStorage.setItem('rf_tpl',id);
   document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
 }
@@ -1654,13 +1709,66 @@ function initSig(){
   sigCanvas.addEventListener('touchstart',e=>{e.preventDefault();sigDrawing=true;[sigLastX,sigLastY]=getPos(e.touches[0]);hidePh();},{passive:false});
   sigCanvas.addEventListener('touchmove',e=>{e.preventDefault();if(!sigDrawing)return;draw(e.touches[0]);},{passive:false});
   sigCanvas.addEventListener('touchend',()=>{sigDrawing=false;sigHasContent=true;});
+  const savedSig=localStorage.getItem('rf_sig');
+  if(savedSig){sigImageData=savedSig;sigEnabled=true;_showSigPreview(savedSig);_updateSigBtn();}
 }
 function getPos(e){let r=sigCanvas.getBoundingClientRect();let sx=sigCanvas.width/r.width,sy=sigCanvas.height/r.height;return [(e.clientX-r.left)*sx,(e.clientY-r.top)*sy];}
 function draw(e){let [x,y]=getPos(e);sigCtx.beginPath();sigCtx.moveTo(sigLastX,sigLastY);sigCtx.lineTo(x,y);sigCtx.stroke();[sigLastX,sigLastY]=[x,y];}
 function hidePh(){document.getElementById('sig-ph').style.display='none';}
-function clearSig(){sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);sigHasContent=false;document.getElementById('sig-ph').style.display='block';}
-function toggleSig(){sigEnabled=!sigEnabled;let btn=document.getElementById('sig-toggle');btn.textContent=sigEnabled?'✓ Incluída no documento':'Adicionar ao documento';btn.classList.toggle('primary',sigEnabled);}
-function getSigDataUrl(){if(!sigEnabled||!sigHasContent)return null;return sigCanvas.toDataURL('image/png');}
+function clearSig(){
+  if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);
+  sigHasContent=false;
+  const ph=document.getElementById('sig-ph');if(ph)ph.style.display='block';
+}
+function switchSigTab(mode){
+  sigMode=mode;
+  document.getElementById('sig-tab-draw').classList.toggle('active',mode==='draw');
+  document.getElementById('sig-tab-upload').classList.toggle('active',mode==='upload');
+  document.getElementById('sig-panel-draw').style.display=mode==='draw'?'block':'none';
+  document.getElementById('sig-panel-upload').style.display=mode==='upload'?'block':'none';
+}
+function confirmDrawnSig(){
+  if(!sigHasContent){toast('Desenhe sua assinatura antes de confirmar.');return;}
+  sigImageData=sigCanvas.toDataURL('image/png');
+  localStorage.setItem('rf_sig',sigImageData);
+  _showSigPreview(sigImageData);
+  if(!sigEnabled){sigEnabled=true;_updateSigBtn();}
+}
+function handleSigImage(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    sigImageData=ev.target.result;
+    sigHasContent=true;
+    localStorage.setItem('rf_sig',sigImageData);
+    _showSigPreview(sigImageData);
+    if(!sigEnabled){sigEnabled=true;_updateSigBtn();}
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+function _showSigPreview(dataUrl){
+  document.getElementById('sig-preview-img').src=dataUrl;
+  document.getElementById('sig-input-area').style.display='none';
+  document.getElementById('sig-preview-area').style.display='block';
+}
+function editSig(){
+  document.getElementById('sig-preview-area').style.display='none';
+  document.getElementById('sig-input-area').style.display='block';
+  switchSigTab('draw');
+  clearSig();
+  sigImageData=null;
+  localStorage.removeItem('rf_sig');
+  if(sigEnabled){sigEnabled=false;_updateSigBtn();}
+}
+function _updateSigBtn(){
+  const btn=document.getElementById('sig-toggle');
+  if(!btn)return;
+  btn.textContent=sigEnabled?'✓ Incluída no documento':'Adicionar ao documento';
+  btn.classList.toggle('primary',sigEnabled);
+}
+function toggleSig(){sigEnabled=!sigEnabled;_updateSigBtn();}
+function getSigDataUrl(){if(!sigEnabled||!sigImageData)return null;return sigImageData;}
 
 /* ── HELPERS ── */
 function v(id){return document.getElementById(id)?.value||'';}
@@ -1743,7 +1851,7 @@ function newDoc(){
   setEditMode(false);
   setTipo('recibo');
   ['f-cli','f-cli-doc','f-cli-email','f-cli-tel','f-cli-end','f-cli-obs','f-obs'].forEach(id=>set(id,''));
-  set('f-pag','pix'); set('f-st','pendente');
+  set('f-pag','pix'); set('f-st','pago');
   document.getElementById('item-cards').innerHTML='';
   itemIdCounter=0;
   addItemCard('',1,'');
@@ -1770,7 +1878,7 @@ function generate(){
   saveItemHistory(d.items);
   saveDocToHist(d);
   currentDocData={...d,sigUrl};
-  _docHtml=d.tplId==='wv'?tplWave(d,sigUrl):tplClassic(d,sigUrl);
+  _docHtml=d.tplId==='wv'?tplWave(d,sigUrl):d.tplId==='mo'?tplInvoice(d,sigUrl):tplClassic(d,sigUrl);
 
   // write into iframe
   const frame=document.getElementById('doc-frame');
@@ -1933,7 +2041,7 @@ function shareWhatsAppText(){
     `*Total: ${fmtR(d.total)}*`,`Pagamento: ${d.pag}`,
     d.tipo==='recibo'?`Status: ${d.st}`:d.venc?`Válido até: ${d.venc}`:'',``,
     d.obs?`📋 ${d.obs}`:'',``,
-    `Emitido por ${d.nome||'ReciboFácil'}`
+    `Emitido por ${d.nome||'AkiRecibo'}`
   ].filter(l=>l!==undefined&&l!==null&&l!=='');
   let text=encodeURIComponent(linhas.join('\n'));
   let url=num.length>=10?`https://wa.me/55${num}?text=${text}`:`https://wa.me/?text=${text}`;
@@ -2010,6 +2118,7 @@ function tplWave(d,sigUrl){
   <!-- Conteúdo (cresce para empurrar rodapé para baixo) -->
   <div style="flex:1">
 
+    ${d.tipo==='recibo'?`<div style="padding:16px 40px 0"><div style="padding:12px 14px;background:#f0faf5;border-left:3px solid ${ac};border-radius:0 6px 6px 0"><p style="font-size:13px;color:#374151;line-height:1.7;margin:0">Recebemos do contratante na referida data o valor de <strong style="font-weight:800;color:#065f46">${valorPorExtenso(d.total)}</strong> referente ao descrito abaixo:</p></div></div>`:''}
     <!-- Tabela de itens -->
     <div style="padding:24px 40px 0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:${ac}"><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Nº</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:left;letter-spacing:.5px;text-transform:uppercase">Descrição</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:center;letter-spacing:.5px;text-transform:uppercase">Qtd</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Valor unit.</th><th style="padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:right;letter-spacing:.5px;text-transform:uppercase">Total</th></tr></thead><tbody>${itemRows}</tbody></table></div>
 
@@ -2029,10 +2138,113 @@ function tplWave(d,sigUrl){
     </svg>
     <div style="background:${acd};padding:11px 40px;display:flex;justify-content:space-between;align-items:center">
       <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:500">${d.docNum} &nbsp;·&nbsp; ${d.data}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.5)">recibofácil</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5)">akirecibo</div>
     </div>
   </div>
 
+</div>`;
+}
+
+/* ── VALOR POR EXTENSO ── */
+function valorPorExtenso(valor){
+  const un=['','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+  const dz=['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+  const ct=['','cem','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+  function grupo(n){
+    if(!n)return '';
+    if(n<=19)return un[n];
+    if(n===100)return 'cem';
+    const c=Math.floor(n/100),r=n%100;
+    if(c&&r){
+      const pre=c===1?'cento':ct[c];
+      if(r<=19)return pre+' e '+un[r];
+      const d2=Math.floor(r/10),u2=r%10;
+      return pre+' e '+dz[d2]+(u2?' e '+un[u2]:'');
+    }
+    if(c)return ct[c];
+    const d2=Math.floor(n/10),u2=n%10;
+    return dz[d2]+(u2?' e '+un[u2]:'');
+  }
+  if(!valor||valor<=0)return 'zero reais';
+  const total=Math.round(valor*100);
+  const inteiro=Math.floor(total/100);
+  const cents=total%100;
+  const partes=[];
+  let n=inteiro;
+  if(n>=1000000){const m=Math.floor(n/1000000);partes.push(grupo(m)+(m===1?' milhão':' milhões'));n%=1000000;}
+  if(n>=1000){const m=Math.floor(n/1000);partes.push(m===1?'mil':grupo(m)+' mil');n%=1000;}
+  if(n>0)partes.push(grupo(n));
+  let res='';
+  if(inteiro>0)res=partes.join(' e ')+(inteiro===1?' real':' reais');
+  if(cents>0)res+=(res?' e ':'')+grupo(cents)+(cents===1?' centavo':' centavos');
+  return res||'zero reais';
+}
+
+/* ── TEMPLATE CORPORATIVO (mo) ── */
+function tplInvoice(d,sigUrl){
+  const dk='#475C6E';
+  const tb='#1F2937';
+  const logoBlock=logoData
+    ?`<img src="${logoData}" style="max-height:54px;max-width:150px;object-fit:contain;display:block"/>`
+    :`<div style="width:46px;height:46px;background:#EEF2F6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#1F2937">${(d.nome||'A').charAt(0)}</div>`;
+  const itemRows=d.items.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#DDE3EA'}">
+    <td style="padding:11px 16px;border-bottom:1px solid #ECF0F4;font-size:13px;font-weight:700;color:#6B7280;width:40px">${String(i+1).padStart(2,'0')}</td>
+    <td style="padding:11px 16px;border-bottom:1px solid #ECF0F4;font-size:14px;color:#1C2733">${it.desc}</td>
+    <td style="padding:11px 16px;border-bottom:1px solid #ECF0F4;font-size:14px;color:#374151;text-align:right">${fmtR(it.u)}</td>
+    <td style="padding:11px 16px;border-bottom:1px solid #ECF0F4;font-size:14px;color:#374151;text-align:center">${it.q}</td>
+    <td style="padding:11px 16px;border-bottom:1px solid #ECF0F4;font-size:14px;font-weight:700;color:${dk};text-align:right">${fmtR(it.t)}</td>
+  </tr>`).join('');
+  const discRow=d.discAmt>0?`<tr><td colspan="4" style="padding:7px 16px;font-size:13px;color:#EF4444;text-align:right">Desconto</td><td style="padding:7px 16px;font-size:13px;color:#EF4444;text-align:right;font-weight:600">− ${fmtR(d.discAmt)}</td></tr>`:'';
+  const docInfo=[
+    ['Nº do documento',d.docNum],
+    ['Data de emissão',d.data],
+    d.pag?['Forma de pagamento',d.pag]:null,
+    d.tipo==='orcamento'&&d.venc?['Válido até',d.venc]:null
+  ].filter(Boolean).map(([k,v_])=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid #F0F4F8"><span style="font-size:12px;color:#6B7280;white-space:nowrap">${k}</span><span style="font-size:12px;font-weight:700;color:${dk};text-align:right">${v_}</span></div>`).join('');
+  const statement=d.tipo==='recibo'?`<div style="padding:14px 36px;background:#F4F6F8;border-bottom:2px solid #E2E8EF"><p style="font-size:13px;color:#374151;line-height:1.75;margin:0">Recebemos do contratante na referida data do documento o valor de <strong style="color:${dk};font-weight:800">${valorPorExtenso(d.total)}</strong> referente ao descrito abaixo:</p></div>`:'';
+  const obsBlock=d.obs?`<div style="margin-bottom:22px"><div style="font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Termos & Condições</div><div style="font-size:13px;color:#374151;line-height:1.8;border-left:3px solid ${dk};padding-left:14px">${d.obs.replace(/\n/g,'<br>')}</div></div>`:'';
+  const footerParts=[d.tel,d.email,d.site].filter(Boolean).join('  ·  ');
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111;max-width:794px;margin:0 auto;background:#fff">
+  <div style="padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:2px solid #E2E8EF">
+    <div>${logoBlock}${d.nome?`<div style="font-size:13px;font-weight:700;color:#111;margin-top:10px;line-height:1.6">${d.nome}${d.cpf?`<br><span style="font-size:12px;font-weight:400;color:#6B7280">${d.cpf}</span>`:''}</div>`:''}</div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:44px;font-weight:900;color:${tb};letter-spacing:-1px;line-height:1">${d.tit}</div>
+      <div style="font-size:12px;color:#6B7280;margin-top:4px">${d.docNum} ${d.stBadge}</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;padding:22px 36px;gap:0;border-bottom:1px solid #E8ECF0">
+    <div style="padding-right:24px;border-right:1px solid #E8ECF0">
+      <div style="font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div>
+      <div style="font-size:18px;font-weight:800;color:${dk};margin-bottom:6px">${d.cli||'—'}</div>
+      <div style="font-size:13px;color:#4B5563;line-height:1.8">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div>
+    </div>
+    <div style="padding-left:24px">
+      <div style="font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Dados do documento</div>
+      ${docInfo}
+    </div>
+  </div>
+  ${statement}
+  <div style="padding:0 36px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:${tb}">
+        <th style="padding:11px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;text-align:left;width:40px">#</th>
+        <th style="padding:11px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;text-align:left">Descrição</th>
+        <th style="padding:11px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;text-align:right">Preço Unit.</th>
+        <th style="padding:11px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;text-align:center">Qtd</th>
+        <th style="padding:11px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;text-align:right">Total</th>
+      </tr></thead>
+      <tbody>${itemRows}</tbody>
+      <tfoot>
+        <tr><td colspan="4" style="padding:8px 16px;font-size:13px;color:#6B7280;text-align:right;border-top:1px solid #E8ECF0">Subtotal</td><td style="padding:8px 16px;font-size:13px;font-weight:600;color:#374151;text-align:right;border-top:1px solid #E8ECF0">${fmtR(d.sub)}</td></tr>
+        ${discRow}
+        <tr style="background:${tb}"><td colspan="4" style="padding:14px 16px;font-size:13px;font-weight:800;color:rgba(255,255,255,.8);text-align:right;text-transform:uppercase;letter-spacing:.5px">Total</td><td style="padding:14px 16px;font-size:20px;font-weight:900;color:#fff;text-align:right">${fmtR(d.total)}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+  <div style="padding:24px 36px">
+    ${obsBlock}
+    ${sigBlock(sigUrl,dk,false)}
+  </div>
 </div>`;
 }
 
@@ -2049,11 +2261,12 @@ function tplClassic(d,sigUrl){
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111;padding:44px;max-width:740px;margin:0 auto">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;${hStyle}"><div>${logoBlock}<div style="font-size:18px;font-weight:800;color:#111">${d.nome}</div><div style="font-size:13px;color:#374151;line-height:1.8;margin-top:4px">${[d.cpf,d.email,d.tel].filter(Boolean).join('<br>')}</div></div><div style="text-align:right"><div style="font-size:38px;font-weight:900;color:${ac};letter-spacing:-1px">${d.tit}</div><div style="font-size:15px;color:#374151;margin-top:5px">${d.docNum}${d.stBadge}</div><div style="font-size:13px;color:#4B5563;margin-top:3px">${d.data}</div>${vencRow}</div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px;padding:18px;background:#FAFAFA;border-radius:10px;border:1px solid #F3F4F6"><div><div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">${d.tipo==='recibo'?'Recebido de':'Solicitante'}</div><div style="font-size:16px;font-weight:700;color:#111">${d.cli}</div><div style="font-size:13px;color:#374151;margin-top:3px;line-height:1.6">${[d.cliDoc,d.cliEmail,d.cliTel,d.cliEnd].filter(Boolean).join('<br>')}</div></div><div><div style="font-size:11px;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Pagamento</div><div style="font-size:16px;font-weight:700;color:#111">${d.pag}</div><div style="font-size:13px;color:#374151;margin-top:3px">${d.data}</div></div></div>
+  ${d.tipo==='recibo'?`<div style="margin-bottom:20px;padding:13px 16px;background:#F8FAFC;border-left:3px solid ${ac};border-radius:0 6px 6px 0"><p style="font-size:13px;color:#374151;line-height:1.7;margin:0">Recebemos do contratante na referida data o valor de <strong style="font-weight:800;color:#111">${valorPorExtenso(d.total)}</strong> referente ao descrito abaixo:</p></div>`:''}
   <table style="width:100%;border-collapse:collapse;margin-bottom:22px"><thead><tr style="border-bottom:2px solid ${ac}"><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:left;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Descrição</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:center;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Qtd</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Unit.</th><th style="font-size:12px;font-weight:700;color:#4B5563;text-align:right;padding:9px 12px;text-transform:uppercase;letter-spacing:.5px">Total</th></tr></thead><tbody>${itemRows}</tbody></table>
   <div style="display:flex;justify-content:flex-end;margin-bottom:26px"><div style="min-width:260px"><div style="display:flex;justify-content:space-between;font-size:14px;color:#374151;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Subtotal</span><span>${fmtR(d.sub)}</span></div>${d.discAmt>0?`<div style="display:flex;justify-content:space-between;font-size:14px;color:#ef4444;padding:4px 0;border-bottom:1px solid #F3F4F6"><span>Desconto</span><span>− ${fmtR(d.discAmt)}</span></div>`:''}<div style="display:flex;justify-content:space-between;font-size:21px;font-weight:900;color:#111;padding:10px 0 4px;border-top:2px solid ${ac};margin-top:6px"><span>Total</span><span style="color:${ac}">${fmtR(d.total)}</span></div></div></div>
   ${d.obs?`<div style="font-size:14px;color:#374151;padding:14px 18px;background:#FAFAFA;border-left:3px solid ${ac};border-radius:0 8px 8px 0;margin-bottom:22px;line-height:1.7">${d.obs.replace(/\n/g,'<br>')}</div>`:''}
   ${sigBlock(sigUrl,ac,false)}
-  <div style="font-size:12px;color:#4B5563;text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #F3F4F6">${instaBlock}${siteBlock}${d.docNum} &nbsp;·&nbsp; ${d.data} &nbsp;·&nbsp; recibofácil</div>
+  <div style="font-size:12px;color:#4B5563;text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #F3F4F6">${instaBlock}${siteBlock}${d.docNum} &nbsp;·&nbsp; ${d.data} &nbsp;·&nbsp; akirecibo</div>
 </div>`;
 }
 
@@ -2066,6 +2279,7 @@ rnum();
 loadProv();
 loadLogo();
 initSig();
+(function(){const t=localStorage.getItem('rf_tpl');if(t){const el=document.getElementById('tc-'+t);if(el)pickTpl(t,el);}})();
 renderHist();
 renderCatalogChips();
 addItemCard('',1,'');
@@ -2477,9 +2691,9 @@ document.addEventListener('DOMContentLoaded', function() {
 let aiOpen=false,aiHistory=[],aiCollected={},aiTyping=false,mediaRec=null,aiRecording=false;
 let GEMINI_KEY=(localStorage.getItem('rf_gemini_key')||'').trim();
 let GROQ_KEY=(localStorage.getItem('rf_groq_key')||'').trim();
-let AI_NAME=localStorage.getItem('rf_ai_name')||'RF Assistente';
+let AI_NAME=localStorage.getItem('rf_ai_name')||'Aki Assistente';
 
-const AI_SYSTEM=`Você é {AI_NAME}, assistente do ReciboFácil.
+const AI_SYSTEM=`Você é {AI_NAME}, assistente do AkiRecibo.
 
 ESCOPO: Recibos, orçamentos e consulta de dados do sistema.
 Para assuntos sem relação com isso responda APENAS: "Só posso ajudar com recibos, orçamentos e dados dos seus clientes. 😊"
@@ -2691,6 +2905,36 @@ function clearApiKeys(){
   document.getElementById('groq-status-box').style.display='none';
   checkKeyBanner();
 }
+function exportBackup(){
+  const keys=['rf_cnt','rf_tot','rf_prov','rf_logo','rf_clients','rf_catalog','rf_items','rf_docs','rf_tpl','rf_sig'];
+  const data={version:1,exportDate:new Date().toISOString()};
+  keys.forEach(k=>{const val=localStorage.getItem(k);if(val!==null)data[k]=val;});
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='akirecibo-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Backup exportado com sucesso!','green');
+}
+function importBackup(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.version)throw new Error('inválido');
+      if(!confirm('Isso irá substituir todos os dados atuais. Continuar?')){e.target.value='';return;}
+      const keys=['rf_cnt','rf_tot','rf_prov','rf_logo','rf_clients','rf_catalog','rf_items','rf_docs','rf_tpl','rf_sig'];
+      keys.forEach(k=>{if(data[k]!==undefined&&data[k]!==null)localStorage.setItem(k,data[k]);});
+      toast('Backup importado! Recarregando...','green');
+      setTimeout(()=>location.reload(),1500);
+    }catch(err){alert('Erro ao importar: arquivo inválido ou corrompido.');}
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
 function aiWelcome(){
   const nome=typeof v==='function'?v('f-nome'):'';
   const pn=(nome||'').split(' ')[0].split('—')[0].trim()||'prestador';
@@ -3710,7 +3954,7 @@ async function testApiKey(provider){
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="9" cy="10" r="1" fill="white" stroke="none"/><circle cx="12" cy="10" r="1" fill="white" stroke="none"/><circle cx="15" cy="10" r="1" fill="white" stroke="none"/></svg>
       </div>
       <div class="ai-hinfo">
-        <h4 id="ai-header-name">RF Assistente</h4>
+        <h4 id="ai-header-name">Aki Assistente</h4>
         <p><span class="ai-online"></span> Online — pronto para ajudar</p>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
@@ -3761,7 +4005,7 @@ async function testApiKey(provider){
             Nome do Assistente
           </label>
           <input id="ai-name-input" placeholder="Ex: Lara, Max, Assistente da Ana..." style="background:#fff;border-color:var(--gm)" oninput="this.style.borderColor=this.value?'var(--g)':'var(--gm)'"/>
-          <p style="font-size:11px;color:var(--gd);margin-top:6px;margin-bottom:0">Nome que aparecerá no chat. Padrão: RF Assistente</p>
+          <p style="font-size:11px;color:var(--gd);margin-top:6px;margin-bottom:0">Nome que aparecerá no chat. Padrão: Aki Assistente</p>
         </div>
         <div id="gemini-status-box" style="display:none" class="key-status ok">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -3787,6 +4031,19 @@ async function testApiKey(provider){
         <p style="font-size:11px;color:var(--ink4);margin-bottom:20px;line-height:1.6">Obtenha gratuitamente em <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--g);font-weight:700;text-decoration:none">console.groq.com →</a></p>
         <button onclick="saveApiKeys()" class="bsolid" style="width:100%">Salvar e ativar</button>
         <button onclick="clearApiKeys()" class="bghost" style="width:100%;margin-top:8px;font-size:13px">Remover chaves</button>
+      </div>
+      <div style="padding:0 16px 16px;flex-shrink:0;border-top:1px solid var(--ln);margin-top:4px">
+        <div style="padding-top:16px">
+          <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--ink2)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Dados & Backup
+          </label>
+          <p style="font-size:12px;color:var(--ink4);margin-bottom:10px;line-height:1.5">Exporte recibos, orçamentos, clientes e dados da empresa para um arquivo JSON.</p>
+          <button onclick="exportBackup()" class="bsolid" style="width:100%;margin-bottom:8px;padding:10px">⬇ Exportar backup (JSON)</button>
+          <button onclick="document.getElementById('import-input').click()" class="bghost" style="width:100%;font-size:13px;padding:10px">⬆ Importar backup...</button>
+          <input type="file" id="import-input" accept=".json" style="display:none" onchange="importBackup(event)"/>
+          <p style="font-size:11px;color:var(--ink4);margin-top:6px;line-height:1.4">⚠️ A importação substitui todos os dados atuais.</p>
+        </div>
       </div>
       <div style="padding:12px 16px;border-top:1px solid var(--ln);flex-shrink:0">
         <button onclick="aiShowChat()" class="bghost" style="width:100%;font-size:13px">← Voltar ao chat</button>
